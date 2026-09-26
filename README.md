@@ -1,6 +1,6 @@
 # GameNative for Android Auto
 
-Private fork of [GameNative](https://github.com/utkarshdalal/GameNative) that shows the same app on an Android Auto head unit. The head unit draws GameNative’s own interface. This is a projection app, in the same sense as a phone screen shown on the car display. It is not a media-browser service and it does not use the Android for Cars template screens.
+A fork of [GameNative](https://github.com/utkarshdalal/GameNative) that shows the same app on an Android Auto head unit. The head unit draws GameNative’s own interface. This is a projection app, in the same sense as a phone screen shown on the car display. It is not a media-browser service and it does not use the Android for Cars template screens.
 
 The phone build is unchanged when Android Auto is not connected. While a car session is running, opening the app on the phone switches to a black **Wireless controller capture** screen and forwards a Bluetooth controller to the game.
 
@@ -55,7 +55,7 @@ On the head unit, during a game:
 
 The app checks this repository’s latest GitHub release, not the upstream GameNative update server. A release tag looks like `v1.2.1.23`: version name `1.2.1`, version code `23`. The phone offers an update only when that version code is higher than the installed app. The release has to include an `.apk` file.
 
-While this repository is private, phones cannot see those releases. Make the repository public when you want the in-app notice to work.
+The in-app notice reads the latest release on this repository.
 
 ## Building
 
