@@ -93,3 +93,7 @@ Bugs in Android Auto projection and the controller capture belong with this fork
 [GPL-3.0](LICENSE). See [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES) for other components.
 
 This software is for playing games you legally own.
+
+## Donation
+
+[PayPal](https://www.paypal.me/vantoniadis)
