@@ -26,7 +26,9 @@ Upstream description, in short: GameNative runs PC games you already own on Stea
 
 ## Install
 
-Build a modern debug APK (see [Building](#building)) and install it on the phone. In Android Auto’s app list, open GameNative. The head unit has to allow this app. Whether unknown sources are allowed is a setting on the head unit. The app does not turn that on.
+Build a modern debug APK (see [Building](#building)). Install that APK with [AAEnabler](https://github.com/malebuffy/AAEnabler) or [KingInstaller v1.9](https://github.com/fcaronte/KingInstaller/releases/tag/1.9).
+
+In Android Auto, open Developer settings and turn **Unknown sources** on. Then open GameNative from the Android Auto app list.
 
 Sign in to Steam on the phone or on the head unit. Sign in to GOG, Epic, and Amazon on the phone first. Those stores finish login by returning a result to a phone screen, and the head unit cannot complete that step.
 
@@ -54,8 +56,6 @@ On the head unit, during a game:
 ## Updates
 
 The app checks this repository’s latest GitHub release, not the upstream GameNative update server. A release tag looks like `v1.2.1.23`: version name `1.2.1`, version code `23`. The phone offers an update only when that version code is higher than the installed app. The release has to include an `.apk` file.
-
-The in-app notice reads the latest release on this repository.
 
 ## Building
 
