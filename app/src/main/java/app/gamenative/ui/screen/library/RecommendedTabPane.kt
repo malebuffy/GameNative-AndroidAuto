@@ -19,7 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import app.gamenative.ui.gamenativeViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.gamenative.PrefManager
 import app.gamenative.data.FeaturedItem
@@ -46,7 +46,7 @@ fun RecommendedTabPane(
     currentPaneType: PaneType,
     onNavigate: (LibraryItem) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: GogRecommendationsViewModel = hiltViewModel(),
+    viewModel: GogRecommendationsViewModel = gamenativeViewModel(),
     firstCarouselItemFocusRequester: androidx.compose.ui.focus.FocusRequester? = null,
     firstGridItemFocusRequester: androidx.compose.ui.focus.FocusRequester? = null,
     focusTargetListIndex: Int = 0,

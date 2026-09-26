@@ -1,118 +1,89 @@
-<div align="center">
+# GameNative for Android Auto
 
-# GameNative
+Private fork of [GameNative](https://github.com/utkarshdalal/GameNative) that shows the same app on an Android Auto head unit. The head unit draws GameNative’s own interface. This is a projection app, in the same sense as a phone screen shown on the car display. It is not a media-browser service and it does not use the Android for Cars template screens.
 
-**Play the PC games you already own — from Steam, Epic and GOG — on your Android device, with cloud saves.**
+The phone build is unchanged when Android Auto is not connected. While a car session is running, opening the app on the phone switches to a black **Wireless controller capture** screen and forwards a Bluetooth controller to the game.
 
-<a href="https://trendshift.io/repositories/14497" target="_blank"><img src="https://trendshift.io/api/badge/repositories/14497" alt="utkarshdalal%2FGameNative | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+## Attribution
 
-<a href="https://www.star-history.com/utkarshdalal/gamenative">
- <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/badge?repo=utkarshdalal/GameNative&theme=dark" />
-  <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/badge?repo=utkarshdalal/GameNative" />
-  <img alt="Star History Rank" src="https://api.star-history.com/badge?repo=utkarshdalal/GameNative" />
- </picture>
-</a>
+This is a fork. It is not the upstream GameNative project, and it is not an official release from that project.
 
-[![GitHub Release](https://img.shields.io/github/v/release/utkarshdalal/GameNative?style=flat-square&logo=github&label=latest)](https://github.com/utkarshdalal/GameNative/releases/latest)
-[![GitHub stars](https://img.shields.io/github/stars/utkarshdalal/GameNative?style=flat-square&logo=github&color=ffd700)](https://github.com/utkarshdalal/GameNative/stargazers)
-[![Discord](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fdiscord.com%2Fapi%2Fv9%2Finvites%2F2hKv4VfZfE%3Fwith_counts%3Dtrue&query=%24.approximate_member_count&style=flat-square&logo=discord&logoColor=white&label=discord&color=5865F2&suffix=%20members)](https://discord.gg/2hKv4VfZfE)
-[![License](https://img.shields.io/badge/license-GPL%203.0-blue?style=flat-square)](https://github.com/utkarshdalal/GameNative/blob/master/LICENSE)
-[![Ko-fi](https://img.shields.io/badge/ko--fi-support-FF5E5B?style=flat-square&logo=ko-fi&logoColor=white)](https://ko-fi.com/gamenative)
+- Upstream: [utkarshdalal/GameNative](https://github.com/utkarshdalal/GameNative)
+- Author of GameNative: Utkarsh Dalal
+- This fork tracks that repository as `upstream` and keeps its history
+- License: [GNU GPL-3.0](LICENSE), the same license as upstream. Copyright in the original work stays with its authors. Changes in this fork are released under GPL-3.0 as well
+- Third-party components bundled with GameNative are listed in [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES)
+- Android Auto projection support uses `app/libs/aauto.aar` (`com.google.android.apps.auto.sdk`). That library is not part of upstream GameNative. It is what lets the head unit launch the projection activity
 
-[**Download**](https://github.com/utkarshdalal/GameNative/releases/download/v1.2.1/gamenative-v1.2.1.apk) · [**Discord**](https://discord.gg/2hKv4VfZfE) · [**Support on Ko-fi**](https://ko-fi.com/gamenative)
+Upstream description, in short: GameNative runs PC games you already own on Steam, Epic, GOG, and Amazon directly on Android, with cloud saves, controller and touch controls, and shared game configs. Compatibility notes for the original project live at [gamenative.app/compatibility](https://gamenative.app/compatibility). Support for the original app is on the [GameNative Discord](https://discord.gg/2hKv4VfZfE).
 
-<video src="https://github.com/user-attachments/assets/95b5397b-908a-44ef-a10a-dac7723580b0" autoplay loop muted playsinline width="100%"></video>
+## What this fork adds
 
-</div>
+- The head unit shows the real GameNative screens: library, installs, and the game
+- Install and message dialogs are drawn inside the car screen, so they can be used from the head unit
+- A **Side Menu** button on the game screen opens the left-hand menu
+- A phone-side capture screen relays a Bluetooth controller into the game
 
----
+## Install
 
-GameNative lets you run the PC games in your Steam, Epic and GOG libraries directly on Android — no streaming required. Your saves sync to the cloud, so you can stop on your PC and keep going on your phone.
+Build a modern debug APK (see [Building](#building)) and install it on the phone. In Android Auto’s app list, open GameNative. The head unit has to allow this app. Whether unknown sources are allowed is a setting on the head unit. The app does not turn that on.
 
-It's still early. Not every game runs yet, and some need tweaking to play well, but the community is constantly finding and sharing configs that work — and these get applied automatically. You can see if anyone has tried running your game successfully at https://gamenative.app/compatibility.
+Sign in to Steam on the phone or on the head unit. Sign in to GOG, Epic, and Amazon on the phone first. Those stores finish login by returning a result to a phone screen, and the head unit cannot complete that step.
 
-## What you get
+## Wireless controller
 
-- Play games you actually own on Steam, Epic, GOG and Amazon
-- Cloud saves that carry over between your PC and your phone
-- Automatically applied known configs, so many games just work out of the box with no tweaking required
-- Controller and touch support, with a custom control editor and on-screen HUD
-- Steam DLC, workshop and branch support
-- Active support over Discord if you need help getting a game running
+A Bluetooth controller is delivered to whichever window is in front on the device it is paired to. While Android Auto is running, that window is Android Auto itself, so the controller drives the car interface instead of the game. The head unit also does not hand stick movement to the projected app.
 
-## Demo
+The capture screen on the phone is the workaround. Leave it open and in front.
 
-[TechDweeb](https://www.youtube.com/@TechDweeb) walks through setting up GameNative on an Android handheld in a couple of minutes:
+1. Pair the controller to the **phone**, not the car. A controller paired only to the head unit never reaches this app.
+2. Start GameNative from Android Auto and leave it open on the head unit.
+3. On the phone, open GameNative yourself. As soon as the car session is running, the phone replaces the normal app with a black screen that says **Wireless controller capture**.
+4. Leave that screen in front. The phone display stays on while the capture screen is open. The power button can still turn it off. If Android Auto covers the phone, bring the capture screen back to the front or the controller will drive Android Auto again.
+5. Buttons and stick movement are forwarded to the game on the head unit.
+6. The guide button opens the game’s left menu once the game is running.
+7. When you disconnect Android Auto, the phone returns to the normal GameNative interface.
 
-<div align="center">
+On the head unit, during a game:
 
-<a href="https://youtu.be/QqIChmAu2_A?si=Ha6xzTQXZA2H8HUN&t=53" target="_blank"><img src="https://github.com/user-attachments/assets/6957e3a1-34ac-41f5-b558-0f1868dbf3d4" alt="Youtube Video" /></a>
+- **Side Menu** appears at the top right for 3 seconds when the game starts, and again for 3 seconds each time you touch the screen. It then hides.
+- If on-screen touch controls are visible, Side Menu sits at the top center so it stays clear of those buttons.
+- Side Menu opens the left-hand menu. **Disable mouse input** is in that menu.
+- AI debug prompts are not shown on the head unit. Those cards are separate windows, and the car display cannot click them.
 
-</div>
+## Building
 
-## How to use
+From the repository root, with the Android SDK installed:
 
-1. Download the latest release [here](https://downloads.gamenative.app/releases//gamenative-v.apk)
-2. Install the APK on your Android device
-3. Log in to your Steam account
-4. Install your game
-5. Hit play and enjoy
+```bat
+gradlew.bat :app:assembleModernDebug --no-configuration-cache
+```
 
-## Support
+The APK is written to:
 
-The fastest way to get help is the [Discord server](https://discord.gg/2hKv4VfZfE) — we're 35k+ strong and someone's usually around.
+`app/build/outputs/apk/modern/debug/app-modern-debug.apk`
 
-Please **don't** open issues on GitHub; they're closed automatically. Bring it to Discord instead.
+`app/libs/aauto.aar` has to be present. `local.properties` is not in git. Point it at your SDK:
 
-If you'd like to chip in, you can support the project on [Ko-fi](https://ko-fi.com/gamenative).
+```properties
+sdk.dir=C:\\Users\\you\\AppData\\Local\\Android\\Sdk
+```
 
-## Contributing
+An optional SteamGridDB key can be added there as `STEAMGRIDDB_API_KEY`. Artwork for custom games is skipped without it. Everything else still builds.
 
-Want to help out? Message us to get into the **#development** channel on [Discord](https://discord.gg/2hKv4VfZfE), or open a thread there. Things we're currently looking for help with live on our [Trello board](https://trello.com/b/vGRkFoAM/open-source-board).
+## Upstream
 
-### Building
+To pull later GameNative changes:
 
-Most of the time you don't need this — if you just want to play, grab the release above. This is for contributors.
+```bat
+git fetch upstream
+git merge upstream/master
+```
 
-1. Build it like any normal Android Studio project. Ask on Discord if you get stuck.
-2. **SteamGridDB API key (optional):** to pull game artwork for custom games, add your key to `local.properties`:
-   ```properties
-   STEAMGRIDDB_API_KEY=your_api_key_here
-   ```
-   You can get one from your [SteamGridDB preferences](https://www.steamgriddb.com/profile/preferences). Without it everything still works — it just won't fetch images.
-
-## Analytics & privacy
-
-GameNative uses [PostHog](https://posthog.com) for anonymous analytics. No personal information is ever collected — no names, emails, IPs or device identifiers.
-
-**Always collected**, to improve game compatibility:
-- Game launch, close and exit events (game name, store, session length, average FPS, container config)
-- Game install, cancel and uninstall events
-
-This is how we figure out which games work, how well they run, and which configs to apply automatically for the next person. It can't identify you.
-
-**Optional**, and switchable under *Settings → Info → Usage Analytics*:
-- Feature usage (on-screen keyboard, controller, HUD, control editor)
-- Login success/failure events
-- Recommendation interactions
-- App lifecycle events (foreground/background)
-- Cloud sync events
-
-The full [Privacy Policy](PrivacyPolicy/README.md) has the details.
-
-## Supporters
-
-Thanks to our [Ko-fi sponsors](https://ko-fi.com/gamenative) and [GitHub sponsors](https://github.com/sponsors/utkarshdalal?preview=true), including [CodeRabbit](https://coderabbit.link/gnative).
-
-[![Star History Chart](https://star-history.dera.page/svg?repos=utkarshdalal/GameNative&type=Date&theme=dark)](https://star-history.dera.page/#utkarshdalal/GameNative&Date)
+Bugs in Android Auto projection and the controller capture belong with this fork. Everything else belongs with [upstream GameNative](https://github.com/utkarshdalal/GameNative).
 
 ## License
 
-[GPL 3.0](https://github.com/utkarshdalal/GameNative/blob/master/LICENSE).
+[GPL-3.0](LICENSE). See [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES) for other components.
 
-See [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES) for attributions, copyleft source offers, and notices about third-party and proprietary components bundled with the app.
-
----
-
-**Disclaimer:** This software is meant for playing games that you legally own. Don't use it for piracy or anything else illegal. The maintainer takes no responsibility for misuse.
+This software is for playing games you legally own.

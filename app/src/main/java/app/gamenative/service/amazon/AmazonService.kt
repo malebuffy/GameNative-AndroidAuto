@@ -18,6 +18,7 @@ import app.gamenative.events.AndroidEvent
 import app.gamenative.service.download.GameDownloadService
 import app.gamenative.service.download.NativeTreeDelete
 import app.gamenative.service.NotificationHelper
+import app.gamenative.service.startPlatformService
 import app.gamenative.utils.ContainerUtils
 import app.gamenative.utils.ExecutableSelectionUtils
 import app.gamenative.utils.MarkerUtils
@@ -115,7 +116,7 @@ class AmazonService : Service() {
             if (!hasPerformedInitialSync) {
                 Timber.i("[Amazon] First-time start — starting service with initial sync")
                 intent.action = ACTION_SYNC_LIBRARY
-                context.startForegroundService(intent)
+                context.startPlatformService(intent)
                 return
             }
 
@@ -130,7 +131,7 @@ class AmazonService : Service() {
                 val remainingMinutes = (SYNC_THROTTLE_MILLIS - timeSinceLastSync) / 1000 / 60
                 Timber.i("[Amazon] Starting service without sync — throttled (${remainingMinutes}min remaining)")
             }
-            context.startForegroundService(intent)
+            context.startPlatformService(intent)
         }
 
         fun stop() {
@@ -189,7 +190,7 @@ class AmazonService : Service() {
             Timber.i("[Amazon] Manual sync requested — bypassing throttle")
             val intent = Intent(context, AmazonService::class.java)
             intent.action = ACTION_MANUAL_SYNC
-            context.startForegroundService(intent)
+            context.startPlatformService(intent)
         }
 
         // ── Install queries ───────────────────────────────────────────────────
@@ -831,16 +832,18 @@ class AmazonService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val notification = notificationHelper.createServiceNotification(NotificationHelper.NOTIFICATION_ID_AMAZON, "Connected")
-        try {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-                startForeground(NotificationHelper.NOTIFICATION_ID_AMAZON, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
-            } else {
-                startForeground(NotificationHelper.NOTIFICATION_ID_AMAZON, notification)
+        if (!PluviaApp.isCarProjection) {
+            val notification = notificationHelper.createServiceNotification(NotificationHelper.NOTIFICATION_ID_AMAZON, "Connected")
+            try {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                    startForeground(NotificationHelper.NOTIFICATION_ID_AMAZON, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
+                } else {
+                    startForeground(NotificationHelper.NOTIFICATION_ID_AMAZON, notification)
+                }
+                notificationHelper.markActive(NotificationHelper.NOTIFICATION_ID_AMAZON)
+            } catch (e: Exception) {
+                Timber.w(e, "[Amazon] startForeground not allowed, continuing as a background service")
             }
-            notificationHelper.markActive(NotificationHelper.NOTIFICATION_ID_AMAZON)
-        } catch (e: Exception) {
-            Timber.w(e, "[Amazon] startForeground not allowed, continuing as a background service")
         }
 
         val shouldSync = when (intent?.action) {

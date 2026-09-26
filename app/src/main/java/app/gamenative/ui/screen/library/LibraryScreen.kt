@@ -70,7 +70,7 @@ import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import app.gamenative.ui.gamenativeViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -127,7 +127,7 @@ import android.os.SystemClock
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeLibraryScreen(
-    viewModel: LibraryViewModel = hiltViewModel(),
+    viewModel: LibraryViewModel = gamenativeViewModel(),
     onClickPlay: (String, Boolean) -> Unit,
     onTestGraphics: (String) -> Unit,
     onPlayWithDiagnostics: (String) -> Unit,

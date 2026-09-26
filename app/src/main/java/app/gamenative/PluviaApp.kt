@@ -249,6 +249,9 @@ class PluviaApp : SplitCompatApplication() {
         var isOverlayPaused by mutableStateOf(false)
         @Volatile
         var isActivityInForeground: Boolean = true
+
+        /** True while Android Auto is drawing [app.gamenative.auto.GameNativeCarActivity]. */
+        var isCarProjection by mutableStateOf(false)
         var isImmersiveActivityResumed: Boolean = false
         // True while the booting splash covers the game screen (and its Resume overlay).
         @Volatile

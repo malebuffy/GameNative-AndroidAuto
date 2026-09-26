@@ -9,6 +9,7 @@ import app.gamenative.enums.LoginScreen
 import app.gamenative.events.AndroidEvent
 import app.gamenative.events.SteamEvent
 import app.gamenative.service.SteamService
+import app.gamenative.service.startPlatformService
 import app.gamenative.ui.data.UserLoginState
 import app.gamenative.PrefManager
 import com.posthog.PostHog
@@ -358,7 +359,7 @@ class UserLoginViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val intent = android.content.Intent(context, app.gamenative.service.SteamService::class.java)
-                context.startForegroundService(intent)
+                context.startPlatformService(intent)
             } catch (e: Exception) {
                 Timber.tag("UserLoginViewModel").e(e, "Failed to restart SteamService in retryConnection")
                 showSnack("Failed to restart Steam connection: ${e.localizedMessage}")

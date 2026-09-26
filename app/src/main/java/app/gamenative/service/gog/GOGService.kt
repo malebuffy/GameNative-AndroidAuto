@@ -18,6 +18,7 @@ import app.gamenative.data.GameSource
 import app.gamenative.service.download.GameDownloadService
 import app.gamenative.ui.util.SnackbarManager
 import app.gamenative.service.NotificationHelper
+import app.gamenative.service.startPlatformService
 import app.gamenative.utils.ContainerUtils
 import app.gamenative.utils.LocaleHelper
 import dagger.hilt.android.AndroidEntryPoint
@@ -81,7 +82,7 @@ class GOGService : Service() {
                 Timber.i("[GOGService] First-time start - starting service with initial sync")
                 val intent = Intent(context, GOGService::class.java)
                 intent.action = ACTION_SYNC_LIBRARY
-                context.startForegroundService(intent)
+                context.startPlatformService(intent)
                 return
             }
 
@@ -98,14 +99,14 @@ class GOGService : Service() {
                 Timber.d("[GOGService] Starting service without sync - throttled (${remainingMinutes}min remaining)")
                 // Start service without sync action
             }
-            context.startForegroundService(intent)
+            context.startPlatformService(intent)
         }
 
         fun triggerLibrarySync(context: Context) {
             Timber.i("[GOGService] Triggering manual library sync (bypasses throttle)")
             val intent = Intent(context, GOGService::class.java)
             intent.action = ACTION_MANUAL_SYNC
-            context.startForegroundService(intent)
+            context.startPlatformService(intent)
         }
 
         fun stop() {
@@ -759,17 +760,18 @@ class GOGService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Timber.d("[GOGService] onStartCommand() - action: ${intent?.action}")
 
-        // Start as foreground service
-        val notification = notificationHelper.createServiceNotification(NotificationHelper.NOTIFICATION_ID_GOG, "Connected")
-        try {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-                startForeground(NotificationHelper.NOTIFICATION_ID_GOG, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
-            } else {
-                startForeground(NotificationHelper.NOTIFICATION_ID_GOG, notification)
+        if (!PluviaApp.isCarProjection) {
+            val notification = notificationHelper.createServiceNotification(NotificationHelper.NOTIFICATION_ID_GOG, "Connected")
+            try {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                    startForeground(NotificationHelper.NOTIFICATION_ID_GOG, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
+                } else {
+                    startForeground(NotificationHelper.NOTIFICATION_ID_GOG, notification)
+                }
+                notificationHelper.markActive(NotificationHelper.NOTIFICATION_ID_GOG)
+            } catch (e: Exception) {
+                Timber.w(e, "[GOGService] startForeground not allowed, continuing as a background service")
             }
-            notificationHelper.markActive(NotificationHelper.NOTIFICATION_ID_GOG)
-        } catch (e: Exception) {
-            Timber.w(e, "[GOGService] startForeground not allowed, continuing as a background service")
         }
 
         // Determine if we should sync based on the action

@@ -4123,18 +4123,21 @@ class SteamService : Service(), IChallengeUrlChanged {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
-        // Start up the notification early to to avoid ForegroundServiceDidNotStartInTimeException
-        val notification = notificationHelper.createServiceNotification(NotificationHelper.NOTIFICATION_ID_STEAM, "Running...")
-        try {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-                startForeground(NotificationHelper.NOTIFICATION_ID_STEAM, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
-            } else {
-                startForeground(NotificationHelper.NOTIFICATION_ID_STEAM, notification)
+        // Android Auto is not a foreground activity. Calling startForeground from there
+        // makes the system close the whole app a few seconds after the UI appears.
+        if (!PluviaApp.isCarProjection) {
+            val notification = notificationHelper.createServiceNotification(NotificationHelper.NOTIFICATION_ID_STEAM, "Running...")
+            try {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                    startForeground(NotificationHelper.NOTIFICATION_ID_STEAM, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
+                } else {
+                    startForeground(NotificationHelper.NOTIFICATION_ID_STEAM, notification)
+                }
+                notificationHelper.markActive(NotificationHelper.NOTIFICATION_ID_STEAM)
+                notificationHelper.showIdle(NotificationHelper.NOTIFICATION_ID_STEAM)
+            } catch (e: Exception) {
+                Timber.w(e, "startForeground not allowed, continuing as a background service")
             }
-            notificationHelper.markActive(NotificationHelper.NOTIFICATION_ID_STEAM)
-            notificationHelper.showIdle(NotificationHelper.NOTIFICATION_ID_STEAM)
-        } catch (e: Exception) {
-            Timber.w(e, "startForeground not allowed, continuing as a background service")
         }
 
         when (intent?.action) {

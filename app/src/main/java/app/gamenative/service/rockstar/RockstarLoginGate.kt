@@ -23,7 +23,12 @@ object RockstarLoginGate {
         val intent = Intent(context, RockstarOAuthActivity::class.java)
             .putExtra(RockstarConstants.ACTIVE_TITLE_EXTRA, activeTitle)
         if (context !is Activity) intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        context.startActivity(intent)
+        try {
+            context.startActivity(intent)
+        } catch (error: RuntimeException) {
+            if (pending === deferred) pending = null
+            return Result.failure(error)
+        }
         val token = try { deferred.await() } finally { if (pending === deferred) pending = null }
         if (token.isNullOrEmpty()) return Result.failure(IllegalStateException("Rockstar sign-in cancelled"))
         RockstarAuthManager.store(context, token)

@@ -22,6 +22,7 @@ import app.gamenative.service.download.GameDownloadService
 import app.gamenative.service.download.NativeTreeDelete
 import app.gamenative.utils.ContainerUtils
 import app.gamenative.service.NotificationHelper
+import app.gamenative.service.startPlatformService
 import com.winlator.container.Container
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
@@ -76,7 +77,7 @@ class EpicService : Service() {
                 Timber.tag("EPIC").i("[EpicService] First-time start - starting service with initial sync")
                 val intent = Intent(context, EpicService::class.java)
                 intent.action = ACTION_SYNC_LIBRARY
-                context.startForegroundService(intent)
+                context.startPlatformService(intent)
                 return
             }
 
@@ -93,14 +94,14 @@ class EpicService : Service() {
                 Timber.tag("EPIC").i("Starting service without sync - throttled (${remainingMinutes}min remaining)")
                 // Start service without sync action
             }
-            context.startForegroundService(intent)
+            context.startPlatformService(intent)
         }
 
         fun triggerLibrarySync(context: Context) {
             Timber.tag("EPIC").i("Triggering manual library sync (bypasses throttle)")
             val intent = Intent(context, EpicService::class.java)
             intent.action = ACTION_MANUAL_SYNC
-            context.startForegroundService(intent)
+            context.startPlatformService(intent)
         }
 
         fun stop() {
@@ -683,16 +684,18 @@ class EpicService : Service() {
 
         val instance = getInstance()
         // Start as foreground service
-        val notification = notificationHelper.createServiceNotification(NotificationHelper.NOTIFICATION_ID_EPIC, "Connected")
-        try {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-                startForeground(NotificationHelper.NOTIFICATION_ID_EPIC, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
-            } else {
-                startForeground(NotificationHelper.NOTIFICATION_ID_EPIC, notification)
+        if (!PluviaApp.isCarProjection) {
+            val notification = notificationHelper.createServiceNotification(NotificationHelper.NOTIFICATION_ID_EPIC, "Connected")
+            try {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                    startForeground(NotificationHelper.NOTIFICATION_ID_EPIC, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
+                } else {
+                    startForeground(NotificationHelper.NOTIFICATION_ID_EPIC, notification)
+                }
+                notificationHelper.markActive(NotificationHelper.NOTIFICATION_ID_EPIC)
+            } catch (e: Exception) {
+                Timber.tag("EPIC").w(e, "startForeground not allowed, continuing as a background service")
             }
-            notificationHelper.markActive(NotificationHelper.NOTIFICATION_ID_EPIC)
-        } catch (e: Exception) {
-            Timber.tag("EPIC").w(e, "startForeground not allowed, continuing as a background service")
         }
 
         // Determine if we should sync based on the action

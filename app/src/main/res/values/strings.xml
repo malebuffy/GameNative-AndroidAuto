@@ -1087,6 +1087,9 @@
     <string name="settings_select_language">Select Language</string>
     <string name="settings_language_restart_title">Restart Required</string>
     <string name="settings_language_restart_message">Changing the language requires the app to restart. Do you want to continue?</string>
+    <string name="settings_restart_on_phone">This change applies the next time you open GameNative on the phone.</string>
+    <string name="car_controller_capture">Wireless controller capture</string>
+    <string name="car_side_menu">Side Menu</string>
     <string name="settings_language_restart_confirm">Restart</string>
     <string name="settings_language_changing">Changing language and restarting...</string>
 

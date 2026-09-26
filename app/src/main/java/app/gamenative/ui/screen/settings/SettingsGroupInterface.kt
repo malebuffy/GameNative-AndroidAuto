@@ -728,7 +728,11 @@ fun SettingsGroupInterface(
                 // Small delay to ensure DataStore write completes
                 delay(200)
             }
-            // Restart the app
+            if (PluviaApp.isCarProjection) {
+                showStatusBarLoadingDialog = false
+                SnackbarManager.show(context.getString(R.string.settings_restart_on_phone))
+                return@LaunchedEffect
+            }
             AppUtils.restartApplication(context)
         }
     }
@@ -799,7 +803,11 @@ fun SettingsGroupInterface(
                 // Small delay to ensure DataStore write completes
                 delay(200)
             }
-            // Restart the app
+            if (PluviaApp.isCarProjection) {
+                showLanguageLoadingDialog = false
+                SnackbarManager.show(context.getString(R.string.settings_restart_on_phone))
+                return@LaunchedEffect
+            }
             AppUtils.restartApplication(context)
         }
     }

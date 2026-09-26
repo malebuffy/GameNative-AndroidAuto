@@ -20,7 +20,12 @@ object EaLoginGate {
         pending = deferred
         val intent = Intent(context, EaOAuthActivity::class.java)
         if (context !is Activity) intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        context.startActivity(intent)
+        try {
+            context.startActivity(intent)
+        } catch (error: RuntimeException) {
+            pending = null
+            return Result.failure(error)
+        }
         val code = deferred.await()
         pending = null
         if (code.isNullOrEmpty()) return Result.failure(IllegalStateException("EA sign-in cancelled"))

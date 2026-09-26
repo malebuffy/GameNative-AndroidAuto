@@ -414,6 +414,8 @@ android {
 }
 
 dependencies {
+    implementation(files("libs/aauto.aar"))
+    implementation("androidx.fragment:fragment-ktx:1.8.6")
     implementation(libs.material)
 
     // Chrome Custom Tabs for GOG OAuth

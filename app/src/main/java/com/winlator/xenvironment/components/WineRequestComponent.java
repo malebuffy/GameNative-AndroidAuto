@@ -97,7 +97,7 @@ public class WineRequestComponent extends EnvironmentComponent {
             intent.setClass(context, EpicOAuthActivity.class);
             intent.putExtra(EpicOAuthActivity.EXTRA_GAME_AUTH_URL, url);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(intent);
+            openExternal(context, intent);
             return;
         }
 
@@ -105,7 +105,15 @@ public class WineRequestComponent extends EnvironmentComponent {
             Log.d("WineRequestComponent", "Received request code OPEN_URL with url " + url.substring(0, Math.min(url.length(), 20)));
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            openExternal(context, intent);
+        }
+    }
+
+    private static void openExternal(Context context, Intent intent) {
+        try {
             context.startActivity(intent);
+        } catch (RuntimeException error) {
+            Log.w("WineRequestComponent", "Could not open " + intent.getData(), error);
         }
     }
 

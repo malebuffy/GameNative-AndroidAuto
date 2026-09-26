@@ -1,6 +1,8 @@
 package app.gamenative.ui.theme
 
 import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
@@ -173,10 +175,14 @@ fun PluviaTheme(
 
     val view = LocalView.current
     if (!view.isInEditMode) {
-        val window = (view.context as Activity).window
-        val insetsController = WindowCompat.getInsetsController(window, view)
-        insetsController.isAppearanceLightStatusBars = false
-        insetsController.isAppearanceLightNavigationBars = false
+        val activity = findHostActivity(view.context)
+        if (activity != null) {
+            runCatching {
+                val insetsController = WindowCompat.getInsetsController(activity.window, view)
+                insetsController.isAppearanceLightStatusBars = false
+                insetsController.isAppearanceLightNavigationBars = false
+            }
+        }
     }
 
     CompositionLocalProvider(LocalPluviaColors provides pluviaColors) {
@@ -192,6 +198,15 @@ fun PluviaTheme(
  * Accessor for Pluvia custom colors.
  * Usage: PluviaTheme.colors.accentCyan
  */
+private fun findHostActivity(context: Context): Activity? {
+    var current: Context? = context
+    while (current is ContextWrapper) {
+        if (current is Activity) return current
+        current = current.baseContext
+    }
+    return null
+}
+
 object PluviaTheme {
     val colors: PluviaColors
         @Composable

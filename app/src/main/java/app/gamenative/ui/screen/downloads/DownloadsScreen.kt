@@ -77,7 +77,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import app.gamenative.ui.gamenativeViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.gamenative.R
 import app.gamenative.data.GameSource
@@ -118,7 +118,7 @@ fun HomeDownloadsScreen(
     onTestGraphics: (String) -> Unit,
     onPlayWithDiagnostics: (String) -> Unit,
     onAiDebugRun: (String) -> Unit,
-    viewModel: DownloadsViewModel = hiltViewModel(),
+    viewModel: DownloadsViewModel = gamenativeViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val storageManagerState = rememberContainerStorageManagerUiState()

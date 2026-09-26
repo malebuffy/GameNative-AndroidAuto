@@ -714,11 +714,13 @@ class MainViewModel @Inject constructor(
 
                 if (_state.value.debugRun) {
                     setDebugRun(false)
-                    val reportDir = DebugReportUtils.createPendingReport(context, appId)
-                    if (reportDir != null) {
-                        _uiEvent.send(MainUiEvent.ShowDebugReportDialog(appId, reportDir.absolutePath))
-                    } else {
-                        SnackbarManager.show(context.getString(R.string.debug_report_no_log))
+                    if (!PluviaApp.isCarProjection) {
+                        val reportDir = DebugReportUtils.createPendingReport(context, appId)
+                        if (reportDir != null) {
+                            _uiEvent.send(MainUiEvent.ShowDebugReportDialog(appId, reportDir.absolutePath))
+                        } else {
+                            SnackbarManager.show(context.getString(R.string.debug_report_no_log))
+                        }
                     }
                     return@launch
                 }
@@ -729,7 +731,7 @@ class MainViewModel @Inject constructor(
                 }
 
                 var feedbackRequested = false
-                try {
+                if (!PluviaApp.isCarProjection) try {
                     // Show feedback for all stores except custom games.
                     val feedbackGameSource = ContainerUtils.extractGameSourceFromContainerId(appId)
                     if (feedbackGameSource != GameSource.CUSTOM_GAME) {
@@ -781,7 +783,7 @@ class MainViewModel @Inject constructor(
     }
 
     private suspend fun offerAiDebugRun(context: Context, appId: String, trigger: String): Boolean {
-        if (PrefManager.hideAiFeatures) return false
+        if (PrefManager.hideAiFeatures || PluviaApp.isCarProjection) return false
         return try {
             val container = ContainerUtils.getContainer(context, appId)
             val now = System.currentTimeMillis()

@@ -41,7 +41,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import app.gamenative.R
 import app.gamenative.data.EpicGame
@@ -159,7 +158,7 @@ fun EpicGameManagerDialog(
 
     when {
         visible -> {
-            Dialog(
+            CarDialog(
                 onDismissRequest = onDismissRequest,
                 properties = DialogProperties(
                     usePlatformDefaultWidth = false,

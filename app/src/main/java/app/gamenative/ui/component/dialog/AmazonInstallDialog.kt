@@ -33,7 +33,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import app.gamenative.R
 import app.gamenative.ui.component.LoadingScreen
@@ -71,7 +70,7 @@ fun AmazonInstallDialog(
         availableSpace,
     )
 
-    Dialog(
+    CarDialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(
             usePlatformDefaultWidth = false,

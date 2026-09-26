@@ -1,6 +1,5 @@
 package app.gamenative.ui.screen.xserver
 
-import android.app.Activity
 import android.content.Context
 import android.database.ContentObserver
 import android.graphics.Color
@@ -26,6 +25,7 @@ import android.hardware.display.DisplayManager
 import android.hardware.input.InputManager
 import android.view.InputDevice
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.BackHandler
 import app.gamenative.BuildConfig
 import androidx.compose.foundation.BorderStroke
@@ -66,6 +66,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.zIndex
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.input.pointer.pointerInput
@@ -426,6 +427,48 @@ private fun SyncGyroOverlaySuppression(suppressed: Boolean, viewKey: XServerRend
     }
 }
 
+private object CarSideMenuTouches {
+    var generation by mutableIntStateOf(0)
+        private set
+
+    fun ping() {
+        generation++
+    }
+}
+
+@Composable
+private fun BoxScope.CarSideMenuButton(
+    controlsVisible: Boolean,
+    menuOpen: Boolean,
+    onOpen: () -> Unit,
+) {
+    val touchGeneration = CarSideMenuTouches.generation
+    var visible by remember { mutableStateOf(true) }
+    LaunchedEffect(touchGeneration, menuOpen) {
+        if (menuOpen) {
+            visible = false
+            return@LaunchedEffect
+        }
+        visible = true
+        delay(3_000)
+        visible = false
+    }
+    if (!visible || menuOpen) return
+    TextButton(
+        onClick = onOpen,
+        modifier = Modifier
+            .align(if (controlsVisible) Alignment.TopCenter else Alignment.TopEnd)
+            .zIndex(2f)
+            .padding(8.dp),
+        colors = androidx.compose.material3.ButtonDefaults.textButtonColors(
+            containerColor = androidx.compose.ui.graphics.Color(0xCC121212),
+            contentColor = androidx.compose.ui.graphics.Color.White,
+        ),
+    ) {
+        Text(text = stringResource(R.string.car_side_menu))
+    }
+}
+
 // TODO logs in composables are 'unstable' which can cause recomposition (performance issues)
 
 @Composable
@@ -450,6 +493,7 @@ fun XServerScreen(
 ) {
     Timber.i("Starting up XServerScreen")
     val context = LocalContext.current
+    val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val view = LocalView.current
     val scope = rememberCoroutineScope()
     val imm = remember(context) {
@@ -608,9 +652,16 @@ fun XServerScreen(
     var currentShooterConfig by remember(container.id) {
         mutableStateOf(ShooterModeConfig.fromJson(container.getShooterConfig()))
     }
+    var hasPhysicalController by remember { mutableStateOf(false) }
+    var hasPhysicalMouse by remember { mutableStateOf(false) }
+    var hideCursorForController by remember { mutableStateOf(false) }
+    var hideCursorForControllerApplied by remember { mutableStateOf(false) }
     fun shouldShowMouseCursor(): Boolean {
-        return !container.isDisableMouseInput &&
-            (!container.isTouchscreenMode || currentGestureConfig.showCursorInTouchscreenMode)
+        if (container.isDisableMouseInput) return false
+        if (PluviaApp.isCarProjection && hasPhysicalController && !hasPhysicalMouse && hideCursorForController) {
+            return false
+        }
+        return !container.isTouchscreenMode || currentGestureConfig.showCursorInTouchscreenMode
     }
     fun applyMouseCursorVisibility() {
         xServerView?.renderer?.setCursorVisible(shouldShowMouseCursor())
@@ -624,11 +675,9 @@ fun XServerScreen(
     var quickMenuToolsVisible by remember { mutableStateOf(false) }
     var quickMenuWineProcesses by remember { mutableStateOf<List<ProcessInfo>>(emptyList()) }
     var quickMenuWineProcessesLoading by remember { mutableStateOf(false) }
-    var hasPhysicalController by remember { mutableStateOf(false) }
     var controllerSlotStatusVersion by remember { mutableIntStateOf(0) }
     var keepPausedForEditor by remember { mutableStateOf(false) }
     var hasPhysicalKeyboard by remember { mutableStateOf(false) }
-    var hasPhysicalMouse by remember { mutableStateOf(false) }
     var usingScreenMirror by remember { mutableStateOf(false) }
     var hasInternalTouchpad by remember { mutableStateOf(false) }
     var hasUpdatedScreenGamepad by remember { mutableStateOf(false) }
@@ -1081,6 +1130,11 @@ fun XServerScreen(
         val controllerManager = ControllerManager.getInstance()
         controllerManager.autoAssignConnectedDevices()
         hasPhysicalController = controllerManager.getDetectedDevices().isNotEmpty()
+        if (PluviaApp.isCarProjection && hasPhysicalController && !hasPhysicalMouse && !hideCursorForControllerApplied) {
+            hideCursorForControllerApplied = true
+            hideCursorForController = true
+            applyMouseCursorVisibility()
+        }
         controllerSlotStatusVersion++
         xServerView?.getxServer()?.winHandler?.refreshControllerMappingsForHotplug()
 
@@ -1164,6 +1218,11 @@ fun XServerScreen(
 
                 hideInputControls()
                 areControlsVisible = false
+            }
+            if (PluviaApp.isCarProjection && !hasPhysicalMouse && !hideCursorForControllerApplied) {
+                hideCursorForControllerApplied = true
+                hideCursorForController = true
+                applyMouseCursorVisibility()
             }
         }
     }
@@ -1257,6 +1316,10 @@ fun XServerScreen(
             }
 
             QuickMenuAction.DISABLE_MOUSE -> {
+                if (PluviaApp.isCarProjection && hasPhysicalController && !hasPhysicalMouse) {
+                    hideCursorForController = !hideCursorForController
+                    applyMouseCursorVisibility()
+                } else {
                 val newValue = !isDisableMouseInput
                 isDisableMouseInput = newValue
                 container.setDisableMouseInput(newValue)
@@ -1266,6 +1329,7 @@ fun XServerScreen(
                     xServerView?.renderer?.setCursorVisible(false)
                 } else {
                     applyMouseCursorVisibility()
+                }
                 }
                 true
             }
@@ -1635,7 +1699,9 @@ fun XServerScreen(
                 keyboardEscMenuHandler.handleOverlayEsc(it.event, keyboard)
                 if (it.event.action == KeyEvent.ACTION_DOWN && it.event.repeatCount == 0) {
                     if (BuildConfig.MODERN_ANDROID) {
-                        (context as? ComponentActivity)?.onBackPressedDispatcher?.onBackPressed()
+                        val dispatcher = (context as? ComponentActivity)?.onBackPressedDispatcher
+                            ?: backDispatcher
+                        if (dispatcher != null) dispatcher.onBackPressed() else gameBack()
                     } else {
                         gameBack()
                     }
@@ -1885,6 +1951,12 @@ fun XServerScreen(
             .fillMaxSize()
             .pointerHoverIcon(PointerIcon.Default)
             .pointerInteropFilter { event ->
+                if (PluviaApp.isCarProjection &&
+                    (event.actionMasked == MotionEvent.ACTION_DOWN ||
+                        event.actionMasked == MotionEvent.ACTION_POINTER_DOWN)
+                ) {
+                    CarSideMenuTouches.ping()
+                }
                 val hud = performanceHudView
                 if (hud != null) {
                     when (event.actionMasked) {
@@ -2047,7 +2119,7 @@ fun XServerScreen(
                 renderer.setOnFrameRenderedListener {
                     if (shouldTrackDisplayedFrames.get()) {
                         val frameTime = SystemClock.elapsedRealtime()
-                        (context as? Activity)?.runOnUiThread {
+                        android.os.Handler(android.os.Looper.getMainLooper()).post {
                             frameRating?.update(frameTime)
                         }
                     }
@@ -2174,7 +2246,7 @@ fun XServerScreen(
                                 }
                                 frameRatingWindowId = -1
                                 runCatching { windowActivity.onTrackedWindow(null, rating.totalFrames) }
-                                (context as? Activity)?.runOnUiThread {
+                                android.os.Handler(android.os.Looper.getMainLooper()).post {
                                     rating.visibility = View.GONE
                                 }
                                 return
@@ -2187,7 +2259,7 @@ fun XServerScreen(
                                 reason,
                                 describeFrameRatingWindow(topmost),
                             )
-                            (context as? Activity)?.runOnUiThread {
+                            android.os.Handler(android.os.Looper.getMainLooper()).post {
                                 rating.reset()
                                 rating.visibility = View.VISIBLE
                             }
@@ -2207,7 +2279,7 @@ fun XServerScreen(
                             }
                             if (window.id == frameRatingWindowId) {
                                 val frameTime = SystemClock.elapsedRealtime()
-                                (context as? Activity)?.runOnUiThread {
+                                android.os.Handler(android.os.Looper.getMainLooper()).post {
                                     frameRating?.update(frameTime)
                                 }
                             }
@@ -2900,6 +2972,14 @@ fun XServerScreen(
             )
         }
 
+        if (PluviaApp.isCarProjection) {
+            CarSideMenuButton(
+                controlsVisible = areControlsVisible,
+                menuOpen = showQuickMenu,
+                onOpen = gameBack,
+            )
+        }
+
         QuickMenu(
             isVisible = showQuickMenu,
             onDismiss = dismissOverlayMenu,
@@ -2940,7 +3020,7 @@ fun XServerScreen(
                 if (areControlsVisible) add(QuickMenuAction.INPUT_CONTROLS)
                 if (isTouchscreenModeActive) add(QuickMenuAction.TOUCHSCREEN_MODE)
                 if (isShooterModeActive) add(QuickMenuAction.SHOOTER_MODE)
-                if (isDisableMouseInput) add(QuickMenuAction.DISABLE_MOUSE)
+                if (isDisableMouseInput || hideCursorForController) add(QuickMenuAction.DISABLE_MOUSE)
             },
             // LSFG hot-reload (tab only visible when enabled in container settings)
             lsfg = LsfgQuickMenuState(

@@ -256,7 +256,7 @@ fun SettingsGroupDebug() {
             modifier = Modifier.combinedClickable(
                 onLongClick = {
                     SteamService.logOut()
-                    (context as ComponentActivity).finishAffinity()
+                    (context as? ComponentActivity)?.finishAffinity()
                 },
                 onClick = {
                     SnackbarManager.show("Long click to activate")
@@ -273,7 +273,7 @@ fun SettingsGroupDebug() {
                 onLongClick = {
                     SteamService.stop()
                     SteamService.clearDatabase()
-                    (context as ComponentActivity).finishAffinity()
+                    (context as? ComponentActivity)?.finishAffinity()
                 },
                 onClick = {
                     SnackbarManager.show("Long click to activate")

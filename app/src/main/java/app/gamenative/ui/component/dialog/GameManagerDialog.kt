@@ -43,7 +43,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import app.gamenative.BuildConfig
 import app.gamenative.R
@@ -298,7 +297,7 @@ fun GameManagerDialog(
 
     when {
         visible -> {
-            Dialog(
+            CarDialog(
                 onDismissRequest = onDismissRequest,
                 properties = DialogProperties(
                     usePlatformDefaultWidth = false,

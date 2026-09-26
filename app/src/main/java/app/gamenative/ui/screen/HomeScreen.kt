@@ -8,7 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
+import app.gamenative.ui.gamenativeViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.gamenative.ui.enums.HomeDestination
 import app.gamenative.ui.model.HomeViewModel
@@ -18,7 +18,7 @@ import app.gamenative.ui.theme.PluviaTheme
 
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel = hiltViewModel(),
+    viewModel: HomeViewModel = gamenativeViewModel(),
     onChat: (Long) -> Unit,
     onClickExit: () -> Unit,
     onClickPlay: (String, Boolean) -> Unit,

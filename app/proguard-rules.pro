@@ -50,6 +50,14 @@
 -dontwarn horizon.**
 -dontwarn com.meta.horizon.**
 
+-keep class app.gamenative.auto.CarService { *; }
+-keep class app.gamenative.auto.GameNativeCarActivity { *; }
+-keep class com.google.android.apps.auto.sdk.** { *; }
+-keep class com.google.android.gms.car.** { *; }
+-dontwarn com.google.android.apps.auto.sdk.**
+-dontwarn com.google.android.gms.car.**
+-dontwarn android.support.**
+
 # Samsung Performance SDK (bundled stub jar, referenced by powercontrol Samsung driver)
 -keep class com.samsung.sdk.sperf.** { *; }
 -dontwarn com.samsung.sdk.sperf.**

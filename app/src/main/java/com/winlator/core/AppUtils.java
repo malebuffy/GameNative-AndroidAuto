@@ -62,6 +62,9 @@ public abstract class AppUtils {
     }
 
     public static void restartApplication(Context context, int selectedMenuItemId) {
+        if (app.gamenative.PluviaApp.Companion.isCarProjection()) {
+            return;
+        }
         Intent intent = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
         Intent mainIntent = Intent.makeRestartActivityTask(intent.getComponent());
         if (selectedMenuItemId > 0) mainIntent.putExtra("selected_menu_item_id", selectedMenuItemId);

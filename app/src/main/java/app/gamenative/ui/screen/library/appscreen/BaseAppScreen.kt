@@ -545,7 +545,7 @@ abstract class BaseAppScreen {
         libraryItem: LibraryItem,
         onAiDebugRun: () -> Unit,
     ): AppMenuOption? {
-        if (PrefManager.hideAiFeatures) return null
+        if (PrefManager.hideAiFeatures || PluviaApp.isCarProjection) return null
         return AppMenuOption(
             AppOptionMenuType.AiDebugRun,
             onClick = { onAiDebugRun() },

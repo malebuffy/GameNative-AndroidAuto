@@ -37,7 +37,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -69,6 +68,7 @@ import app.gamenative.events.AndroidEvent
 import app.gamenative.gamefixes.GameFixesRegistry
 import app.gamenative.service.ActiveGameRegistry
 import app.gamenative.service.SteamService
+import app.gamenative.service.startPlatformService
 import app.gamenative.service.ea.EaLaunchSupport
 import app.gamenative.service.ea.EaLoginGate
 import app.gamenative.service.rockstar.RockstarLaunchSupport
@@ -332,7 +332,7 @@ private fun trackGameLaunched(appId: String) {
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun PluviaMain(
-    viewModel: MainViewModel = hiltViewModel(),
+    viewModel: MainViewModel = gamenativeViewModel(),
     navController: NavHostController = rememberNavController(),
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
 ) {
@@ -701,6 +701,7 @@ fun PluviaMain(
                 }
 
                 is MainViewModel.MainUiEvent.ShowGameFeedbackDialog -> {
+                    if (PluviaApp.isCarProjection) return@collect
                     gameFeedbackState = GameFeedbackDialogState(
                         visible = true,
                         appId = event.appId,
@@ -727,6 +728,7 @@ fun PluviaMain(
                 }
 
                 is MainViewModel.MainUiEvent.ShowDebugReportDialog -> {
+                    if (PluviaApp.isCarProjection) return@collect
                     val dir = File(event.reportDir)
                     val header = withContext(Dispatchers.IO) { DebugReportUtils.readHeader(dir) }
                     debugReportState = DebugReportDialogState(
@@ -741,6 +743,7 @@ fun PluviaMain(
                 }
 
                 is MainViewModel.MainUiEvent.ShowAiDebugOffer -> {
+                    if (PluviaApp.isCarProjection) return@collect
                     aiDebugOfferAppId = event.appId
                     aiDebugOfferTrigger = event.trigger
                     trackAiDebugOffer("ai_debug_offer_shown", event.appId, event.trigger)
@@ -810,6 +813,7 @@ fun PluviaMain(
 
     LaunchedEffect(Unit) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            try {
             // Only attempt reconnection if not already connected/connecting and not in offline mode
             val shouldAttemptReconnect = !state.isSteamConnected &&
                 !isConnecting &&
@@ -817,9 +821,8 @@ fun PluviaMain(
 
             if (shouldAttemptReconnect) {
                 Timber.d("[PluviaMain]: Steam not connected - attempting reconnection")
-                isConnecting = true
                 viewModel.startConnecting()
-                context.startForegroundService(Intent(context, SteamService::class.java))
+                isConnecting = context.startPlatformService(Intent(context, SteamService::class.java))
             }
 
             // Start GOGService if user has GOG
@@ -863,6 +866,11 @@ fun PluviaMain(
                     }
                 }
                 navController.navigateFromLoginIfNeeded(targetRoute, "ResumeSession")
+            }
+            } catch (error: kotlinx.coroutines.CancellationException) {
+                throw error
+            } catch (error: Throwable) {
+                Timber.e(error, "Platform services did not start")
             }
         }
     }
@@ -1510,7 +1518,7 @@ fun PluviaMain(
             }
 
             DebugPreRunDialog(
-                visible = debugPreRunVisible,
+                visible = debugPreRunVisible && !PluviaApp.isCarProjection,
                 onStart = {
                     debugPreRunVisible = false
                     val appId = debugPreRunAppId
@@ -1549,7 +1557,7 @@ fun PluviaMain(
             }
 
             DebugReportDialog(
-                state = debugReportState,
+                state = if (PluviaApp.isCarProjection) debugReportState.copy(visible = false) else debugReportState,
                 hasDiscordToken = discordTokenPresent,
                 onStateChange = { debugReportState = it },
                 onSend = submitDebugReport,
@@ -1568,7 +1576,7 @@ fun PluviaMain(
                 },
             )
 
-            debugPaywallReason?.let { reason ->
+            if (!PluviaApp.isCarProjection) debugPaywallReason?.let { reason ->
                 Box(modifier = Modifier.zIndex(5f)) {
                     DebugPaywallScreen(
                         gameName = debugReportState.gameName,
@@ -1622,7 +1630,7 @@ fun PluviaMain(
                         },
                         onRetry = {
                             viewModel.retryConnection()
-                            context.startForegroundService(Intent(context, SteamService::class.java))
+                            context.startPlatformService(Intent(context, SteamService::class.java))
                         },
                         onDismiss = {
                             connectionBannerDismissed = true
@@ -1788,9 +1796,11 @@ fun PluviaMain(
                             )
                         },
                         onAiDebugRun = { appId ->
-                            debugPreRunAppId = appId
-                            debugPreRunOffline = isOffline
-                            debugPreRunVisible = true
+                            if (!PluviaApp.isCarProjection) {
+                                debugPreRunAppId = appId
+                                debugPreRunOffline = isOffline
+                                debugPreRunVisible = true
+                            }
                         },
                         onClickExit = {
                             if (!PrefManager.warnBeforeExit) {
