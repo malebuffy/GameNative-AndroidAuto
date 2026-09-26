@@ -38,6 +38,6 @@ object Constants {
         const val DISCORD_SHOP_LINK = "https://discord.com/channels/1378308569287622737/shop"
         const val GITHUB_LINK = "https://github.com/utkarshdalal/GameNative"
         const val PRIVACY_LINK = "https://github.com/utkarshdalal/GameNative/tree/master/PrivacyPolicy"
-        const val UPDATE_CHECK_URL = "https://api.gamenative.app/api/update-check"
+        const val UPDATE_CHECK_URL = "https://api.github.com/repos/malebuffy/GameNative-AndroidAuto/releases/latest"
     }
 }

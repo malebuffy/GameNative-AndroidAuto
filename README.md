@@ -51,6 +51,12 @@ On the head unit, during a game:
 - Side Menu opens the left-hand menu. **Disable mouse input** is in that menu.
 - AI debug prompts are not shown on the head unit. Those cards are separate windows, and the car display cannot click them.
 
+## Updates
+
+The app checks this repository’s latest GitHub release, not the upstream GameNative update server. A release tag looks like `v1.2.1.23`: version name `1.2.1`, version code `23`. The phone offers an update only when that version code is higher than the installed app. The release has to include an `.apk` file.
+
+While this repository is private, phones cannot see those releases. Make the repository public when you want the in-app notice to work.
+
 ## Building
 
 From the repository root, with the Android SDK installed:
