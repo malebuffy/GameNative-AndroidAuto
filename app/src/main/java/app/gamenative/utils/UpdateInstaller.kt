@@ -1,9 +1,12 @@
 package app.gamenative.utils
 
+import android.app.Activity
+import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.provider.Settings
 import androidx.core.content.FileProvider
 import app.gamenative.BuildConfig
 import app.gamenative.service.SteamService
@@ -13,12 +16,27 @@ import timber.log.Timber
 import java.io.File
 
 object UpdateInstaller {
+    enum class Result {
+        Started,
+        NeedsPermission,
+        Failed,
+    }
+
+    enum class ResumeAction {
+        Idle,
+        Started,
+        PermissionDenied,
+    }
+
+    private var pendingApk: File? = null
+    private var awaitingPermission = false
+
     suspend fun downloadAndInstall(
         context: Context,
         downloadUrl: String,
         versionName: String,
-        onProgress: (Float) -> Unit
-    ): Boolean = withContext(Dispatchers.IO) {
+        onProgress: (Float) -> Unit,
+    ): Result = withContext(Dispatchers.IO) {
         try {
             val apkFileName = "gamenative-v$versionName.apk"
             val destFile = File(context.cacheDir, apkFileName)
@@ -32,85 +50,104 @@ object UpdateInstaller {
                 onProgress = onProgress,
             )
 
-            // Verify the file exists and has content
-            if (!destFile.exists()) {
-                Timber.e("Downloaded file does not exist: ${destFile.absolutePath}")
-                return@withContext false
+            if (!destFile.exists() || destFile.length() == 0L) {
+                Timber.e("Downloaded update is missing or empty: ${destFile.absolutePath}")
+                return@withContext Result.Failed
             }
 
-            val fileSize = destFile.length()
-            if (fileSize == 0L) {
-                Timber.e("Downloaded file is empty: ${destFile.absolutePath}")
-                return@withContext false
-            }
+            Timber.i("Download complete: ${destFile.absolutePath}, size: ${destFile.length()} bytes")
 
-            Timber.i("Download complete: ${destFile.absolutePath}, size: $fileSize bytes")
-
-            // Install the APK
             withContext(Dispatchers.Main) {
-                installApk(context, destFile)
+                if (!canRequestPackageInstalls(context)) {
+                    pendingApk = destFile
+                    awaitingPermission = true
+                    Result.NeedsPermission
+                } else {
+                    pendingApk = null
+                    awaitingPermission = false
+                    if (installApk(context, destFile)) Result.Started else Result.Failed
+                }
             }
-
-            return@withContext true
         } catch (e: Exception) {
             Timber.e(e, "Error downloading/installing update")
-            return@withContext false
+            Result.Failed
         }
     }
 
-    private fun installApk(context: Context, apkFile: File) {
-        try {
-            // Verify file exists before attempting installation
-            if (!apkFile.exists()) {
-                Timber.e("APK file does not exist: ${apkFile.absolutePath}")
-                return
-            }
+    fun openInstallPermissionSettings(context: Context) {
+        val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
+            data = Uri.parse("package:${context.packageName}")
+        }
+        startActivity(context, intent)
+    }
 
-            Timber.i("Installing APK from: ${apkFile.absolutePath}, size: ${apkFile.length()} bytes")
+    /**
+     * Continues an update after the user returns from the install-permission screen.
+     * Does nothing when no download is waiting.
+     */
+    fun onHostResume(context: Context): ResumeAction {
+        val apk = pendingApk ?: return ResumeAction.Idle
+        if (!canRequestPackageInstalls(context)) {
+            if (!awaitingPermission) return ResumeAction.Idle
+            awaitingPermission = false
+            return ResumeAction.PermissionDenied
+        }
+        awaitingPermission = false
+        pendingApk = null
+        return if (installApk(context, apk)) ResumeAction.Started else ResumeAction.PermissionDenied
+    }
 
-            val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                // Use FileProvider for Android 7.0+
-                try {
-                    FileProvider.getUriForFile(
-                        context,
-                        "${BuildConfig.APPLICATION_ID}.fileprovider",
-                        apkFile
-                    )
-                } catch (e: Exception) {
-                    Timber.e(e, "Error getting FileProvider URI")
-                    return
-                }
-            } else {
-                // Use file:// URI for older versions
-                Uri.fromFile(apkFile)
-            }
+    private fun canRequestPackageInstalls(context: Context): Boolean {
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.O ||
+            context.packageManager.canRequestPackageInstalls()
+    }
 
-            Timber.i("FileProvider URI: $uri")
-            Timber.i("File absolute path: ${apkFile.absolutePath}")
-            Timber.i("File exists: ${apkFile.exists()}, size: ${apkFile.length()}")
+    private fun installApk(context: Context, apkFile: File): Boolean {
+        if (!apkFile.exists() || apkFile.length() == 0L) {
+            Timber.e("APK file is missing: ${apkFile.absolutePath}")
+            return false
+        }
 
-            val intent = Intent(Intent.ACTION_VIEW).apply {
-                setDataAndType(uri, "application/vnd.android.package-archive")
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            }
+        val uri = try {
+            FileProvider.getUriForFile(
+                context,
+                "${BuildConfig.APPLICATION_ID}.fileprovider",
+                apkFile,
+            )
+        } catch (e: Exception) {
+            Timber.e(e, "Error getting FileProvider URI")
+            return false
+        }
 
-            // Grant URI permissions to the package installer
-            val resInfoList = context.packageManager.queryIntentActivities(intent, 0)
-            for (resolveInfo in resInfoList) {
-                val packageName = resolveInfo.activityInfo.packageName
-                context.grantUriPermission(
-                    packageName,
-                    uri,
-                    Intent.FLAG_GRANT_READ_URI_PERMISSION
-                )
-            }
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(uri, "application/vnd.android.package-archive")
+            clipData = ClipData.newRawUri("", uri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
 
-            context.startActivity(intent)
-            Timber.i("Install intent launched successfully")
+        val resInfoList = context.packageManager.queryIntentActivities(intent, 0)
+        for (resolveInfo in resInfoList) {
+            context.grantUriPermission(
+                resolveInfo.activityInfo.packageName,
+                uri,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION,
+            )
+        }
+
+        return try {
+            startActivity(context, intent)
+            Timber.i("Install intent launched for ${apkFile.absolutePath}")
+            true
         } catch (e: Exception) {
             Timber.e(e, "Error launching install intent")
+            false
         }
     }
-}
 
+    private fun startActivity(context: Context, intent: Intent) {
+        if (context !is Activity) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        context.startActivity(intent)
+    }
+}

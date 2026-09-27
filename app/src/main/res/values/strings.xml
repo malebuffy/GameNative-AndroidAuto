@@ -1320,6 +1320,7 @@
     <string name="main_later_button">Later</string>
     <string name="main_update_failed_title">Update Failed</string>
     <string name="main_update_failed_message">Failed to download or install the update. Please try again later.</string>
+    <string name="main_update_permission_message">Allow GameNative to install unknown apps, then return here. The update will continue.</string>
     <string name="launch_dependency_failed_title">Downloading launch dependency failed</string>
     <string name="launch_dependency_failed_message">Failed to download a required component. Please try again later.</string>
 

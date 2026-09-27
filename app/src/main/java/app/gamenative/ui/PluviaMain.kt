@@ -38,6 +38,7 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -346,6 +347,29 @@ fun PluviaMain(
         mutableStateOf(MessageDialogState(false))
     }
     val setMessageDialogState: (MessageDialogState) -> Unit = { msgDialogState = it }
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event != Lifecycle.Event.ON_RESUME) return@LifecycleEventObserver
+            when (UpdateInstaller.onHostResume(context)) {
+                UpdateInstaller.ResumeAction.PermissionDenied -> {
+                    msgDialogState = MessageDialogState(
+                        visible = true,
+                        type = DialogType.SYNC_FAIL,
+                        title = context.getString(R.string.main_update_failed_title),
+                        message = context.getString(R.string.main_update_permission_message),
+                        dismissBtnText = context.getString(R.string.ok),
+                    )
+                }
+                UpdateInstaller.ResumeAction.Started,
+                UpdateInstaller.ResumeAction.Idle,
+                -> Unit
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+
     var membershipPitchTrigger by rememberSaveable { mutableStateOf("launch") }
 
     var gameFeedbackState by rememberSaveable(stateSaver = GameFeedbackDialogState.Saver) {
@@ -1210,7 +1234,7 @@ fun PluviaMain(
                         viewModel.setLoadingDialogMessage("Downloading update...")
                         viewModel.setLoadingDialogProgress(0f)
 
-                        val success = UpdateInstaller.downloadAndInstall(
+                        val result = UpdateInstaller.downloadAndInstall(
                             context = context,
                             downloadUrl = updateInfo.downloadUrl,
                             versionName = updateInfo.versionName,
@@ -1220,14 +1244,21 @@ fun PluviaMain(
                         )
 
                         viewModel.setLoadingDialogVisible(false)
-                        if (!success) {
-                            msgDialogState = MessageDialogState(
-                                visible = true,
-                                type = DialogType.SYNC_FAIL,
-                                title = context.getString(R.string.main_update_failed_title),
-                                message = context.getString(R.string.main_update_failed_message),
-                                dismissBtnText = context.getString(R.string.ok),
-                            )
+                        when (result) {
+                            UpdateInstaller.Result.NeedsPermission -> {
+                                SnackbarManager.show(context.getString(R.string.main_update_permission_message))
+                                UpdateInstaller.openInstallPermissionSettings(context)
+                            }
+                            UpdateInstaller.Result.Failed -> {
+                                msgDialogState = MessageDialogState(
+                                    visible = true,
+                                    type = DialogType.SYNC_FAIL,
+                                    title = context.getString(R.string.main_update_failed_title),
+                                    message = context.getString(R.string.main_update_failed_message),
+                                    dismissBtnText = context.getString(R.string.ok),
+                                )
+                            }
+                            UpdateInstaller.Result.Started -> Unit
                         }
                     }
                 }
