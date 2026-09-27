@@ -769,7 +769,8 @@
     <string name="playtime">Playtime</string>
     <string name="add_custom_game_content_desc">Add custom game</string>
     <string name="add_custom_game_dialog_title">Add Custom Game</string>
-    <string name="add_custom_game_dialog_message">Please select the folder containing the game files you want to add as a custom game.</string>
+    <string name="add_custom_game_dialog_message">Select the folder that already contains the game. GameNative plays it from that folder and does not copy the files, so other apps can use the same folder. All files access is required.</string>
+    <string name="custom_game_storage_permission_required">All files access is required to play a game from its existing folder.</string>
     <string name="add_custom_game_dont_show_again">Don\'t show this dialog again</string>
     <string name="custom_game_importing">Importing game…</string>
     <string name="custom_game_import_success">Game imported</string>

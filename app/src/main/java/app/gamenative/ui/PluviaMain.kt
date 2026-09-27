@@ -2358,6 +2358,14 @@ fun preLaunchApp(
 
         // For Custom Games, bypass Steam Cloud operations entirely and proceed to launch
         if (isCustomGame) {
+            val folder = CustomGameScanner.getFolderPathFromAppId(appId)
+            if (folder != null && !CustomGameScanner.hasStoragePermission(context, folder)) {
+                Timber.tag("preLaunchApp").w("Custom game $appId is outside app storage and all-files access is missing")
+                setLoadingDialogVisible(false)
+                CustomGameScanner.requestManageExternalStoragePermission(context)
+                SnackbarManager.show(context.getString(R.string.custom_game_storage_permission_required))
+                return@launch
+            }
             Timber.tag("preLaunchApp").i("Custom Game detected for $appId — skipping Steam Cloud sync and launching container")
             setLoadingDialogVisible(false)
             onSuccess(context, appId)

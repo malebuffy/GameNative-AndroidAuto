@@ -1065,7 +1065,12 @@ object ContainerUtils {
         }
 
         val resolvedGameFolderPath = if (gameSource == GameSource.CUSTOM_GAME) {
-            CustomGameScanner.migrateFromPublicRoot(gameFolderPath)
+            val manualPath = gameFolderPath?.let { File(it).absolutePath }
+            if (manualPath != null && PrefManager.customGameManualFolders.contains(manualPath)) {
+                manualPath
+            } else {
+                CustomGameScanner.migrateFromPublicRoot(gameFolderPath)
+            }
         } else {
             StorageUtils.resolveLegacyGameDir(gameFolderPath)
         }

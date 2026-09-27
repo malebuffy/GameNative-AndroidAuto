@@ -1,8 +1,11 @@
 package app.gamenative.ui.screen.library
 
+import android.Manifest
 import android.content.Intent
 import android.content.res.Configuration
-import android.net.Uri
+import android.os.Build
+import android.os.Environment
+import android.provider.Settings
 import android.view.InputDevice
 import android.view.KeyEvent
 import android.view.MotionEvent
@@ -11,10 +14,8 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -36,7 +37,6 @@ import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetState
@@ -71,10 +71,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.gamenative.ui.gamenativeViewModel
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import app.gamenative.BuildConfig
 import app.gamenative.PrefManager
 import app.gamenative.PluviaApp
 import app.gamenative.R
@@ -88,7 +88,6 @@ import app.gamenative.ui.component.GamepadActionBar
 import app.gamenative.ui.component.GamepadButton
 import app.gamenative.ui.component.LibraryActions
 import app.gamenative.ui.components.rememberCustomGameFolderPicker
-import app.gamenative.ui.components.requestPermissionsForPath
 import app.gamenative.ui.data.LibraryState
 import app.gamenative.ui.enums.AppFilter
 import app.gamenative.ui.enums.LibraryTab
@@ -140,13 +139,10 @@ fun HomeLibraryScreen(
     isSteamConnected: Boolean = false,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val importState by viewModel.importState.collectAsStateWithLifecycle()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     LibraryScreenContent(
         state = state,
-        importState = importState,
-        onImportCustomGame = viewModel::importCustomGame,
         listState = viewModel.listState,
         sheetState = sheetState,
         onFilterChanged = viewModel::onFilterChanged,
@@ -193,8 +189,6 @@ private fun LibraryScreenContent(
     state: LibraryState,
     listState: LazyGridState,
     sheetState: SheetState,
-    importState: LibraryViewModel.CustomGameImportState = LibraryViewModel.CustomGameImportState(),
-    onImportCustomGame: (Uri, Boolean) -> Unit = { _, _ -> },
     onFilterChanged: (AppFilter) -> Unit,
     onPageChange: (Int) -> Unit,
     onModalBottomSheet: (Boolean) -> Unit,
@@ -495,26 +489,17 @@ private fun LibraryScreenContent(
         return true
     }
 
-    val storagePermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions(),
-    ) { }
-
     val folderPicker = rememberCustomGameFolderPicker(
         onPathSelected = { path ->
-            // When a folder is selected via OpenDocumentTree, the user has already granted
-            // URI permissions for that specific folder. We should verify we can access it
-            // rather than checking for broad storage permissions.
             val folder = java.io.File(path)
             val canAccess = try {
-                folder.exists() && (folder.isDirectory && folder.canRead())
-            } catch (e: Exception) {
+                folder.exists() && folder.isDirectory && folder.canRead()
+            } catch (_: Exception) {
                 false
             }
-
-            // Only request permissions if we can't access the folder AND it's outside the sandbox
-            // (folders selected via OpenDocumentTree should already be accessible)
             if (!canAccess && !CustomGameScanner.hasStoragePermission(context, path)) {
-                requestPermissionsForPath(context, path, storagePermissionLauncher)
+                SnackbarManager.show(context.getString(R.string.custom_game_storage_permission_required))
+                return@rememberCustomGameFolderPicker
             }
             onAddCustomGameFolder(path)
         },
@@ -523,26 +508,55 @@ private fun LibraryScreenContent(
         },
     )
 
-    // Modern add path: import the picked folder into app-owned storage via the SAF grant,
-    // since the map-in-place flow needs MANAGE_EXTERNAL_STORAGE
-    var showModernImportDialog by remember { mutableStateOf(false) }
-    var importRemoveOriginal by rememberSaveable { mutableStateOf(false) }
-    val importLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocumentTree(),
-    ) { uri ->
-        if (uri != null) {
-            onImportCustomGame(uri, importRemoveOriginal)
+    val storagePermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions(),
+    ) { permissions ->
+        val granted = permissions.isNotEmpty() && permissions.values.all { it }
+        if (granted) {
+            folderPicker.launchPicker()
+        } else {
+            SnackbarManager.show(context.getString(R.string.custom_game_storage_permission_required))
         }
     }
 
-    // Handle opening folder picker (with dialog check)
-    val onAddCustomGameClick = {
-        if (BuildConfig.MODERN_ANDROID) {
-            showModernImportDialog = true
-        } else if (PrefManager.showAddCustomGameDialog) {
-            showAddCustomGameDialog = true
+    val manageStorageLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+    ) {
+        val granted = Build.VERSION.SDK_INT < Build.VERSION_CODES.R || Environment.isExternalStorageManager()
+        if (granted) {
+            folderPicker.launchPicker()
+        } else {
+            SnackbarManager.show(context.getString(R.string.custom_game_storage_permission_required))
+        }
+    }
+
+    fun requestStorageThenPick() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()) {
+            val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION).apply {
+                data = android.net.Uri.parse("package:${context.packageName}")
+            }
+            manageStorageLauncher.launch(intent)
+        } else if (
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.R &&
+            ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) !=
+            android.content.pm.PackageManager.PERMISSION_GRANTED
+        ) {
+            storagePermissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                ),
+            )
         } else {
             folderPicker.launchPicker()
+        }
+    }
+
+    val onAddCustomGameClick = {
+        if (PrefManager.showAddCustomGameDialog) {
+            showAddCustomGameDialog = true
+        } else {
+            requestStorageThenPick()
         }
     }
 
@@ -1375,67 +1389,6 @@ private fun LibraryScreenContent(
 
         }
 
-        // Pre-import dialog (modern add path)
-        if (showModernImportDialog) {
-            AlertDialog(
-                onDismissRequest = { showModernImportDialog = false },
-                title = { Text(stringResource(R.string.add_custom_game_dialog_title)) },
-                text = {
-                    Column {
-                        Text(stringResource(R.string.custom_game_import_dialog_message))
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.clickable { importRemoveOriginal = !importRemoveOriginal },
-                        ) {
-                            Checkbox(
-                                checked = importRemoveOriginal,
-                                onCheckedChange = { importRemoveOriginal = it },
-                            )
-                            Text(stringResource(R.string.custom_game_import_remove_original))
-                        }
-                    }
-                },
-                confirmButton = {
-                    TextButton(
-                        onClick = {
-                            showModernImportDialog = false
-                            importLauncher.launch(null)
-                        },
-                    ) {
-                        Text(stringResource(R.string.continue_action))
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { showModernImportDialog = false }) {
-                        Text(stringResource(R.string.cancel))
-                    }
-                },
-            )
-        }
-
-        // Import progress dialog (modern add path)
-        if (importState.isImporting) {
-            AlertDialog(
-                onDismissRequest = { },
-                title = { Text(stringResource(R.string.custom_game_importing)) },
-                text = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        CircularProgressIndicator()
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Column {
-                            val mb = (importState.progress?.copiedBytes ?: 0L) / 1_000_000L
-                            Text("$mb MB")
-                            importState.progress?.currentFile?.let {
-                                Text(text = it, maxLines = 1)
-                            }
-                        }
-                    }
-                },
-                confirmButton = { },
-            )
-        }
-
         // Add custom game dialog
         if (showAddCustomGameDialog) {
             AlertDialog(
@@ -1470,7 +1423,7 @@ private fun LibraryScreenContent(
                                 PrefManager.showAddCustomGameDialog = false
                             }
                             showAddCustomGameDialog = false
-                            folderPicker.launchPicker()
+                            requestStorageThenPick()
                         },
                     ) {
                         Text(stringResource(android.R.string.ok))
