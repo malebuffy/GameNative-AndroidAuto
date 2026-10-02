@@ -209,6 +209,7 @@
 
     <!--Winlator-->
     <string name="disabled">비활성화</string>
+    <string name="enabled">활성화됨</string>
     <string name="copy">복사</string>
     <string name="stability">안정성</string>
     <string name="compatibility">호환성</string>
@@ -238,7 +239,6 @@
     <string name="remove">제거</string>
     <string name="add">추가</string>
     <string name="delete">삭제</string>
-    <string name="copy_from">복사 위치</string>
     <string name="ok">확인</string>
     <string name="container_config_custom_resolution_title">사용자 지정 해상도 설정</string>
     <string name="container_config_custom_resolution_separator">x</string>
@@ -294,6 +294,28 @@
     <string name="left_stick">왼쪽 스틱</string>
     <string name="right_stick">오른쪽 스틱</string>
     <string name="dpad_category">십자 버튼</string>
+    <string name="physical_controller_settings_title">물리 컨트롤러 설정</string>
+    <string name="physical_controller_settings_save_failed">컨트롤러 설정을 저장하지 못했습니다. 다시 시도하세요.</string>
+    <string name="left_stick_deadzone">왼쪽 스틱 데드존</string>
+    <string name="right_stick_deadzone">오른쪽 스틱 데드존</string>
+    <string name="left_stick_sensitivity">왼쪽 스틱 감도</string>
+    <string name="right_stick_sensitivity">오른쪽 스틱 감도</string>
+    <string name="stick_deadzone_description">입력이 감지되기 전에 스틱을 움직여야 하는 거리입니다. 드리프트를 멈추려면 값을 높이세요.</string>
+    <string name="stick_sensitivity_description">스틱을 일부만 기울였을 때의 입력을 확대합니다. 1.0을 넘어도 게임패드 최대 출력을 초과하지 않으며, 더 적게 기울여도 최대 출력에 도달합니다.</string>
+    <string name="left_stick_deadzone_shape">왼쪽 스틱 데드존 형태</string>
+    <string name="right_stick_deadzone_shape">오른쪽 스틱 데드존 형태</string>
+    <string name="stick_deadzone_axial_description">각 축을 따로 측정합니다. 수평·수직 이동을 곧게 유지하기 쉽지만 대각선 이동은 덜 균일하게 느껴질 수 있습니다.</string>
+    <string name="stick_deadzone_circular_description">중심에서의 거리를 하나의 원으로 측정합니다. 스틱 방향을 유지해 모든 방향에서 부드럽고 균일하게 움직입니다.</string>
+    <string name="stick_deadzone_hybrid_description">원형 데드존을 사용한 뒤 수평·수직에 가까운 움직임을 축에 고정합니다. 부드러운 대각선과 곧은 상하좌우 이동을 함께 제공합니다.</string>
+    <string name="stick_deadzone_axial">축별</string>
+    <string name="stick_deadzone_circular">원형</string>
+    <string name="stick_deadzone_hybrid">하이브리드</string>
+    <string name="left_stick_direction_mode">왼쪽 스틱 방향 스냅</string>
+    <string name="right_stick_direction_mode">오른쪽 스틱 방향 스냅</string>
+    <string name="stick_direction_mode_description">전체 스틱 출력을 고정된 방향으로 맞춥니다. 4방향은 대각선을 제거하고, 8방향은 상하좌우와 대각선 각도만 허용합니다.</string>
+    <string name="stick_direction_unrestricted">제한 없음</string>
+    <string name="stick_direction_four_way">4방향</string>
+    <string name="stick_direction_eight_way">8방향</string>
     <string name="dpad_up">십자 버튼 위</string>
     <string name="dpad_down">십자 버튼 아래</string>
     <string name="dpad_left">십자 버튼 왼쪽</string>
@@ -476,7 +498,6 @@
     <string name="not_set">설정 안 됨</string>
 
     <!-- Toast -->
-    <string name="toast_controls_reset">컨트롤 재설정됨</string>
     <string name="toast_failed_log_save">대상에 logcat 저장 실패</string>
 
     <!-- Settings -->
@@ -689,18 +710,24 @@
     <string name="pulseaudio_suspend_behavior_thread">스레드를 통한 일시 중단 (기본값)</string>
     <string name="pulseaudio_suspend_behavior_pactl">Pactl을 통한 일시 중단 (절전)</string>
     <string name="pulseaudio_low_latency">PulseAudio 저지연 모드</string>
+    <string name="microphone_input">마이크 입력</string>
+    <string name="microphone_input_description">기기 마이크를 Wine/Proton에 녹음 장치로 노출합니다. 마이크 권한이 필요합니다.</string>
     <string name="show_fps">FPS 표시</string>
     <string name="portrait_mode">세로 모드</string>
     <string name="portrait_mode_description">8BitDo FlipPad/GameSir Pocket Taco 유형 컨트롤러용</string>
+    <string name="portrait_below_cutout">카메라 홀 아래에 표시</string>
+    <string name="portrait_below_cutout_description">세로 모드에서 게임 화면을 카메라 홀 아래에 표시합니다</string>
     <string name="remove_driver_confirmation">드라이버 "%s"을(를) 제거하시겠습니까? 이 작업은 실행 취소할 수 없습니다</string>
 
     <!-- Container Configuration: Steam Integration -->
     <string name="use_legacy_drm">레거시 DRM 사용</string>
     <string name="unpack_files">파일 압축 해제</string>
     <string name="unpack_files_description">\'Application Load Error 3:0000065432\'가 발생하는 경우에만 사용하세요.</string>
+    <string name="load_mods">모드 로더 활성화</string>
+    <string name="load_mods_description">게임 실행 파일 옆에 있는 &lt;b&gt;DLL 기반&lt;/b&gt; 모드 로더를 활성화합니다. 예: BepInEx, MelonLoader, REFramework, Ultimate ASI Loader, UE4SS</string>
     <string name="force_dlc">DLC 강제</string>
     <string name="force_dlc_description">DLC가 감지되지 않거나 DLC가 있는 저장 파일이 작동하지 않는 경우에만 활성화</string>
-    <string name="launch_steam_client_beta">Steam 클라이언트 실행(베타)</string>
+    <string name="launch_steam_client_beta">Steam 클라이언트 실행</string>
     <string name="steam_offline_mode">Steam 오프라인 모드</string>
     <string name="steam_offline_mode_description">Steam 게임을 오프라인 모드로 실행</string>
     <string name="epic_offline_mode">Epic 오프라인 모드</string>
@@ -1562,6 +1589,13 @@
     <string name="recommended_support_message">이 링크를 통해 구매하시면 저희가 수수료를 받습니다.</string>
     <string name="recommended_about_heading">이 게임에 대하여</string>
     <string name="recommended_review_count">%1$s개의 리뷰 기반</string>
+    <string name="library_store_media_page">%2$d개 중 %1$d</string>
+    <string name="library_store_media_fullscreen">미디어 전체 화면으로 보기</string>
+    <string name="library_store_media_close">전체 화면 미디어 닫기</string>
+    <string name="library_store_media_previous">이전 미디어</string>
+    <string name="library_store_media_next">다음 미디어</string>
+    <string name="library_store_about_expand">이 게임에 대하여 펼치기</string>
+    <string name="library_store_about_collapse">이 게임에 대하여 접기</string>
     <string name="review_overwhelmingly_positive">압도적으로 긍정적</string>
     <string name="review_very_positive">매우 긍정적</string>
     <string name="review_mostly_positive">대체로 긍정적</string>
@@ -1587,6 +1621,7 @@
     <string name="hltb_all_styles">모든 스타일</string>
     <string name="hltb_hours_value">%sh</string>
     <string name="hltb_section_title">HLTB</string>
+    <string name="hltb_show_spoilers">스포일러 표시</string>
 
     <!-- LSFG-VK frame generation -->
     <string name="lsfg_tab_title">LSFG-VK</string>
@@ -1736,6 +1771,7 @@
     <string name="filter_five_star_device">기기에서의 별 5개 리뷰</string>
     <string name="filter_five_star_gpu">GPU에서의 별 5개 리뷰</string>
     <string name="filter_proven_gpu">내 GPU에서 검증됨</string>
+    <string name="vibration_intensity">진동 강도</string>
     <string name="option_import_files">파일 가져오기</string>
     <string name="option_export_files">파일 내보내기</string>
     <string name="container_files_up">위로</string>
@@ -1778,6 +1814,7 @@
     <string name="export_files_cancelled">내보내기가 취소되었습니다</string>
     <string name="export_files_no_container">게임을 한 번 실행하여 컨테이너를 만든 다음 파일을 내보내세요.</string>
     <string name="export_files_failed_header">다음 파일을 내보낼 수 없습니다:</string>
+    <string name="app_filter_vr">VR 게임</string>
     <string name="option_manage_mods">Nexus 모드 관리</string>
     <string name="nexus_search_clear">검색 지우기</string>
     <string name="nexus_filter_all">전체</string>
@@ -2657,4 +2694,32 @@
     <string name="nexus_apply_failure_title">마지막 모드 설치 실패</string>
     <string name="nexus_apply_failure_description">모드가 설치 완료로 표시되지 않았습니다. 안전하게 확인할 수 있는 변경 사항은 되돌렸습니다. 아래 파일 오류를 확인한 뒤 배치 화면으로 돌아가 수정하거나 다시 시도하세요.</string>
     <string name="nexus_apply_failure_details">파일 오류: %1$d</string>
+    <string name="control_profiles">컨트롤 프로필</string>
+    <string name="more_options">추가 옵션</string>
+    <string name="control_profiles_empty">사용 가능한 컨트롤 프로필이 없습니다.</string>
+    <string name="control_profile_applied_sections">적용됨 · 설정 %2$d개 중 %1$d개</string>
+    <string name="control_profile_apply">적용</string>
+    <string name="control_profile_applied">컨트롤 프로필을 적용했습니다</string>
+    <string name="control_profile_export">내보내기</string>
+    <string name="control_profile_create_blank">빈 프로필</string>
+    <string name="control_profile_create_current">현재 컨트롤에서</string>
+    <string name="control_profile_start_with">시작 항목</string>
+    <string name="control_profile_create_current_hint">이 게임에서 저장할 설정을 선택하세요.</string>
+    <string name="control_profile_create_blank_hint">빈 화면 컨트롤 레이아웃으로 시작합니다.</string>
+    <string name="control_profile_create_applies_hint">새 프로필이 라이브러리에 저장되고 이 게임에 즉시 적용됩니다.</string>
+    <string name="control_profile_create_and_apply">생성 및 적용</string>
+    <string name="control_profile_created_applied">컨트롤 프로필을 생성하고 적용했습니다</string>
+    <string name="control_profile_save_current">현재 컨트롤 저장</string>
+    <string name="control_profile_update_current">현재 컨트롤에서 업데이트</string>
+    <string name="control_profile_sections">포함된 설정</string>
+    <string name="control_profile_section_on_screen">화면 컨트롤</string>
+    <string name="control_profile_section_physical">물리 컨트롤러</string>
+    <string name="control_profile_controls_count">화면 컨트롤 %1$d개</string>
+    <string name="control_profile_bindings_count">물리 버튼 매핑 %1$d개</string>
+    <string name="control_profile_radial_count">방사형 메뉴 슬롯 %1$d개</string>
+    <string name="control_profile_import_confirm">라이브러리에 추가</string>
+    <string name="control_profile_saved">컨트롤 프로필을 저장했습니다</string>
+    <string name="control_profile_failed">컨트롤 프로필 작업 실패: %1$s</string>
+    <string name="control_profile_delete_title">컨트롤 프로필을 삭제할까요?</string>
+    <string name="control_profile_delete_message">라이브러리에서 “%1$s”을(를) 제거할까요? 이미 이 프로필로 설정된 게임의 컨트롤은 유지됩니다.</string>
 </resources>

@@ -98,6 +98,8 @@
     <string name="pulseaudio_suspend_behavior_thread">Приостановка через поток (По умолчанию)</string>
     <string name="pulseaudio_suspend_behavior_pactl">Приостановка через Pactl (Энергосбережение)</string>
     <string name="pulseaudio_low_latency">Режим низкой задержки PulseAudio</string>
+    <string name="microphone_input">Микрофонный вход</string>
+    <string name="microphone_input_description">Предоставляет микрофон устройства Wine/Proton как устройство записи. Требуется разрешение на микрофон.</string>
     <string name="auth_webview_title">Авторизация</string>
     <string name="autofill">Автозаполнение</string>
     <string name="back">Назад</string>
@@ -340,7 +342,6 @@
     <string name="continue_offline">Продолжить в автономном режиме</string>
     <string name="controller_disconnected">Отключено</string>
     <string name="copy">Копировать</string>
-    <string name="copy_from">Копировать из</string>
     <string name="copy_size_from_element">Скопировать размер из элемента</string>
     <string name="copy_toast_msg">Ссылка скопирована в буфер обмена</string>
     <string name="cpu_label">CPU%d</string>
@@ -381,6 +382,7 @@
     <string name="disable_mouse_input">Отключить ввод мыши</string>
     <string name="disable_present_wait">Отключить KHR_present_wait</string>
     <string name="disabled">Отключено</string>
+    <string name="enabled">Включено</string>
     <string name="discard">Отменить</string>
     <string name="done">Готово</string>
     <string name="download">Загрузить</string>
@@ -397,6 +399,28 @@
     <string name="download_prompt_title">Установить приложение</string>
     <string name="downloading">Загрузка...</string>
     <string name="dpad_category">D-Pad</string>
+    <string name="physical_controller_settings_title">Настройки физического контроллера</string>
+    <string name="physical_controller_settings_save_failed">Не удалось сохранить настройки контроллера. Повторите попытку.</string>
+    <string name="left_stick_deadzone">Мёртвая зона левого джойстика</string>
+    <string name="right_stick_deadzone">Мёртвая зона правого джойстика</string>
+    <string name="left_stick_sensitivity">Чувствительность левого джойстика</string>
+    <string name="right_stick_sensitivity">Чувствительность правого джойстика</string>
+    <string name="stick_deadzone_description">Определяет, насколько нужно отклонить стик, прежде чем ввод будет зарегистрирован. Увеличьте значение, чтобы устранить дрейф.</string>
+    <string name="stick_sensitivity_description">Усиливает частичное отклонение стика. Значение выше 1,0 не превышает максимум геймпада, а достигает его при меньшем физическом отклонении.</string>
+    <string name="left_stick_deadzone_shape">Форма мёртвой зоны левого джойстика</string>
+    <string name="right_stick_deadzone_shape">Форма мёртвой зоны правого джойстика</string>
+    <string name="stick_deadzone_axial_description">Измеряет каждую ось отдельно. Упрощает прямое движение по горизонтали и вертикали, но диагонали могут ощущаться менее равномерными.</string>
+    <string name="stick_deadzone_circular_description">Измеряет расстояние от центра как единый круг. Сохраняет направление стика для плавного и равномерного движения.</string>
+    <string name="stick_deadzone_hybrid_description">Использует круглую мёртвую зону, затем фиксирует движение рядом с горизонталью и вертикалью. Сочетает плавные диагонали с более прямыми основными направлениями.</string>
+    <string name="stick_deadzone_axial">Осевая</string>
+    <string name="stick_deadzone_circular">Круговая</string>
+    <string name="stick_deadzone_hybrid">Гибридная</string>
+    <string name="left_stick_direction_mode">Фиксация направлений левого джойстика</string>
+    <string name="right_stick_direction_mode">Фиксация направлений правого джойстика</string>
+    <string name="stick_direction_mode_description">Привязывает весь сигнал стика к фиксированным направлениям. 4 направления исключают диагонали; 8 направлений допускают только основные и диагональные углы.</string>
+    <string name="stick_direction_unrestricted">Без ограничений</string>
+    <string name="stick_direction_four_way">4 направления</string>
+    <string name="stick_direction_eight_way">8 направлений</string>
     <string name="dpad_down">D-Pad вниз</string>
     <string name="dpad_left">D-Pad влево</string>
     <string name="dpad_right">D-Pad вправо</string>
@@ -660,7 +684,7 @@
     <string name="last_played">Последний раз играл</string>
     <string name="launch_dependency_failed_message">Ошибка загрузки требуемого компонента. Пожалуйста, попробуйте позже.</string>
     <string name="launch_dependency_failed_title">Ошибка загрузки зависимости запуска</string>
-    <string name="launch_steam_client_beta">Запустить Steam Client (бета)</string>
+    <string name="launch_steam_client_beta">Запустить Steam Client</string>
     <string name="launch_steam_client_description">Рекомендуется Headless\nТребуется для EA, Rockstar, Ubisoft и других лаунчеров\nВключает мультиплеер и устраняет проблемы с DRM и контроллером</string>
     <string name="launch_bionic_steam">Включить экспериментальный Bionic Steam</string>
     <string name="left_analog_stick">Левый аналоговый джойстик</string>
@@ -1357,7 +1381,6 @@ https://gamenative.app
     <string name="thumbstick_buttons">Кнопки джойстика</string>
     <string name="thumbstick_buttons_category">Кнопки джойстика</string>
     <string name="title_ubuntufs">Ubuntu FS</string>
-    <string name="toast_controls_reset">Управления сброшены</string>
     <string name="toast_copied_size">Скопирован размер: %.2fx</string>
     <string name="toast_failed_log_save">Ошибка сохранения logcat в место назначения</string>
     <string name="toast_no_elements_to_copy">Нет других доступных элементов для копирования размера из</string>
@@ -1397,6 +1420,8 @@ https://gamenative.app
     <string name="unknown_app">Неизвестное приложение</string>
     <string name="unpack_files">Распаковать файлы</string>
     <string name="unpack_files_description">Используйте только если вы получаете \'Application Load Error 3:0000065432\'.</string>
+    <string name="load_mods">Включить загрузчики модов</string>
+    <string name="load_mods_description">Включает загрузчики модов &lt;b&gt;на основе DLL&lt;/b&gt;, расположенные рядом с исполняемым файлом игры, например BepInEx, MelonLoader, REFramework, Ultimate ASI Loader и UE4SS</string>
     <string name="unsaved_changes">Несохранённые изменения</string>
     <string name="unsaved_changes_message">У вас есть несохранённые изменения. Вы хотите их сохранить или отменить?</string>
     <string name="untrusted_files_detected">Обнаружены недоверенные файлы</string>
@@ -1515,6 +1540,13 @@ https://gamenative.app
     <string name="recommended_support_message">Мы получаем комиссию с покупок, совершённых по этой ссылке.</string>
     <string name="recommended_about_heading">Об этой игре</string>
     <string name="recommended_review_count">На основе %1$s отзывов</string>
+    <string name="library_store_media_page">%1$d из %2$d</string>
+    <string name="library_store_media_fullscreen">Открыть медиафайлы на весь экран</string>
+    <string name="library_store_media_close">Закрыть полноэкранный просмотр</string>
+    <string name="library_store_media_previous">Предыдущий медиафайл</string>
+    <string name="library_store_media_next">Следующий медиафайл</string>
+    <string name="library_store_about_expand">Развернуть раздел «Об этой игре»</string>
+    <string name="library_store_about_collapse">Свернуть раздел «Об этой игре»</string>
     <string name="review_overwhelmingly_positive">Крайне положительные</string>
     <string name="review_very_positive">Очень положительные</string>
     <string name="review_mostly_positive">В основном положительные</string>
@@ -1552,6 +1584,7 @@ https://gamenative.app
     <string name="hltb_all_styles">Все стили</string>
     <string name="hltb_hours_value">%sh</string>
     <string name="hltb_section_title">HLTB</string>
+    <string name="hltb_show_spoilers">Показать спойлеры</string>
 
     <!-- LSFG-VK frame generation -->
     <string name="lsfg_tab_title">LSFG-VK</string>
@@ -1665,6 +1698,7 @@ https://gamenative.app
     <string name="filter_five_star_device">5-звёздочные отзывы на устройстве</string>
     <string name="filter_five_star_gpu">5-звёздочные отзывы на GPU</string>
     <string name="filter_proven_gpu">Проверено на вашем GPU</string>
+    <string name="vibration_intensity">Интенсивность вибрации</string>
     <string name="option_import_files">Импорт файлов</string>
     <string name="option_export_files">Экспорт файлов</string>
     <string name="container_files_up">Вверх</string>
@@ -1707,6 +1741,7 @@ https://gamenative.app
     <string name="export_files_cancelled">Экспорт отменён</string>
     <string name="export_files_no_container">Запустите игру один раз, чтобы создать её контейнер, затем экспортируйте файлы.</string>
     <string name="export_files_failed_header">Не удалось экспортировать эти файлы:</string>
+    <string name="app_filter_vr">VR-игра</string>
     <string name="option_manage_mods">Управление модами Nexus</string>
     <string name="nexus_search_clear">Очистить поиск</string>
     <string name="nexus_filter_all">Все</string>
@@ -2595,4 +2630,32 @@ https://gamenative.app
     <string name="nexus_apply_failure_title">Последняя установка мода не удалась</string>
     <string name="nexus_apply_failure_description">Мод не отмечен как установленный. Изменения отменены там, где это удалось безопасно проверить. Просмотрите ошибки файлов ниже, затем вернитесь к размещению, чтобы исправить или повторить установку.</string>
     <string name="nexus_apply_failure_details">Ошибки файлов: %1$d</string>
+    <string name="control_profiles">Профили управления</string>
+    <string name="more_options">Дополнительные параметры</string>
+    <string name="control_profiles_empty">Нет доступных профилей управления.</string>
+    <string name="control_profile_applied_sections">Применено · %1$d из %2$d настроек</string>
+    <string name="control_profile_apply">Применить</string>
+    <string name="control_profile_applied">Профиль управления применён</string>
+    <string name="control_profile_export">Экспортировать</string>
+    <string name="control_profile_create_blank">Пустой профиль</string>
+    <string name="control_profile_create_current">Из текущего управления</string>
+    <string name="control_profile_start_with">Начать с</string>
+    <string name="control_profile_create_current_hint">Выберите настройки этой игры, которые нужно сохранить.</string>
+    <string name="control_profile_create_blank_hint">Начать с пустой раскладки экранного управления.</string>
+    <string name="control_profile_create_applies_hint">Новый профиль будет сохранён в библиотеке и сразу применён к этой игре.</string>
+    <string name="control_profile_create_and_apply">Создать и применить</string>
+    <string name="control_profile_created_applied">Профиль управления создан и применён</string>
+    <string name="control_profile_save_current">Сохранить текущее управление</string>
+    <string name="control_profile_update_current">Обновить из текущего управления</string>
+    <string name="control_profile_sections">Включённые настройки</string>
+    <string name="control_profile_section_on_screen">Экранное управление</string>
+    <string name="control_profile_section_physical">Физический контроллер</string>
+    <string name="control_profile_controls_count">Экранных элементов управления: %1$d</string>
+    <string name="control_profile_bindings_count">Назначений физического контроллера: %1$d</string>
+    <string name="control_profile_radial_count">Секторов радиального меню: %1$d</string>
+    <string name="control_profile_import_confirm">Добавить в библиотеку</string>
+    <string name="control_profile_saved">Профиль управления сохранён</string>
+    <string name="control_profile_failed">Ошибка операции с профилем управления: %1$s</string>
+    <string name="control_profile_delete_title">Удалить профиль управления?</string>
+    <string name="control_profile_delete_message">Удалить «%1$s» из библиотеки? Игры, уже настроенные с ним, сохранят свои элементы управления.</string>
 </resources>

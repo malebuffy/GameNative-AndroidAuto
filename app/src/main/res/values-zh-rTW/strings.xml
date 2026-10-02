@@ -198,6 +198,7 @@
 
     <!--Winlator-->
     <string name="disabled">已禁用</string>
+    <string name="enabled">已啟用</string>
     <string name="copy">複製</string>
     <string name="stability">穩定</string>
     <string name="compatibility">相容性</string>
@@ -227,7 +228,6 @@
     <string name="remove">刪除</string>
     <string name="add">添加</string>
     <string name="delete">刪除</string>
-    <string name="copy_from">從...複製</string>
     <string name="ok">確認</string>
     <string name="storage_info">存儲信息</string>
     <string name="duplicate">複製</string>
@@ -280,6 +280,28 @@
     <string name="left_stick">左搖桿</string>
     <string name="right_stick">右搖桿</string>
     <string name="dpad_category">方向鍵</string>
+    <string name="physical_controller_settings_title">實體控制器設定</string>
+    <string name="physical_controller_settings_save_failed">無法儲存控制器設定。請再試一次。</string>
+    <string name="left_stick_deadzone">左搖桿死區</string>
+    <string name="right_stick_deadzone">右搖桿死區</string>
+    <string name="left_stick_sensitivity">左搖桿靈敏度</string>
+    <string name="right_stick_sensitivity">右搖桿靈敏度</string>
+    <string name="stick_deadzone_description">搖桿移動多遠後才會偵測到輸入。調高可消除飄移。</string>
+    <string name="stick_sensitivity_description">放大搖桿的部分行程。高於 1.0 也不會超過控制器最大輸出，而是用較小的實際行程達到最大輸出。</string>
+    <string name="left_stick_deadzone_shape">左搖桿死區形狀</string>
+    <string name="right_stick_deadzone_shape">右搖桿死區形狀</string>
+    <string name="stick_deadzone_axial_description">分別測量每個軸。更容易維持水平和垂直直線移動，但斜向移動可能較不均勻。</string>
+    <string name="stick_deadzone_circular_description">將距中心的距離視為一個圓來測量。保留搖桿方向，使各方向移動平順均勻。</string>
+    <string name="stick_deadzone_hybrid_description">先使用圓形死區，再將接近水平或垂直的移動鎖定到軸向。兼顧平順斜向移動和更直的上下左右移動。</string>
+    <string name="stick_deadzone_axial">軸向</string>
+    <string name="stick_deadzone_circular">圓形</string>
+    <string name="stick_deadzone_hybrid">混合</string>
+    <string name="left_stick_direction_mode">左搖桿方向吸附</string>
+    <string name="right_stick_direction_mode">右搖桿方向吸附</string>
+    <string name="stick_direction_mode_description">將整個搖桿輸出吸附到固定方向。4 向會移除斜向；8 向僅允許上下左右和斜向角度。</string>
+    <string name="stick_direction_unrestricted">不限制</string>
+    <string name="stick_direction_four_way">4向</string>
+    <string name="stick_direction_eight_way">8向</string>
     <string name="dpad_up">方向鍵 上</string>
     <string name="dpad_down">方向鍵 下</string>
     <string name="dpad_left">方向鍵 左</string>
@@ -462,7 +484,6 @@
     <string name="not_set">未設定</string>
 
     <!-- Toast -->
-    <string name="toast_controls_reset">控制器已重置</string>
     <string name="toast_failed_log_save">無法將 logcat 保存到目標</string>
 
     <!-- Settings -->
@@ -673,18 +694,24 @@
     <string name="pulseaudio_suspend_behavior_thread">透過執行緒暫停（預設）</string>
     <string name="pulseaudio_suspend_behavior_pactl">透過 Pactl 暫停（省電）</string>
     <string name="pulseaudio_low_latency">PulseAudio 低延遲模式</string>
+    <string name="microphone_input">麥克風輸入</string>
+    <string name="microphone_input_description">將裝置麥克風作為錄音裝置提供給 Wine/Proton。需要麥克風權限。</string>
     <string name="show_fps">顯示幀率</string>
     <string name="portrait_mode">直向模式</string>
     <string name="portrait_mode_description">適用於 8BitDo FlipPad/GameSir Pocket Taco 類型控制器</string>
+    <string name="portrait_below_cutout">顯示在相機孔下方</string>
+    <string name="portrait_below_cutout_description">在直向模式下將遊戲畫面顯示在相機孔下方</string>
     <string name="remove_driver_confirmation">您確定要移除驅動程式 "%s"? 此操作無法復原</string>
 
     <!-- Container Configuration: Steam Integration -->
     <string name="use_legacy_drm">使用舊版 DRM</string>
     <string name="unpack_files">解壓檔案</string>
     <string name="unpack_files_description">僅在出現\'應用程式載入錯誤\'時使用。可能會降低幀率。</string>
+    <string name="load_mods">啟用模組載入器</string>
+    <string name="load_mods_description">啟用放在遊戲執行檔旁邊的&lt;b&gt;基於 DLL 的&lt;/b&gt;模組載入器，例如 BepInEx, MelonLoader, REFramework, Ultimate ASI Loader 和 UE4SS</string>
     <string name="force_dlc">強制開啟DLC</string>
     <string name="force_dlc_description">僅在未偵測到 DLC 或包含 DLC 的存檔無法運作時啟用</string>
-    <string name="launch_steam_client_beta">啟動 Steam 用戶端 (Beta)</string>
+    <string name="launch_steam_client_beta">啟動 Steam 用戶端</string>
     <string name="steam_offline_mode">Steam 離線模式</string>
     <string name="steam_offline_mode_description">以離線模式啟動 Steam 遊戲</string>
     <string name="epic_offline_mode">Epic 離線模式</string>
@@ -1558,6 +1585,13 @@
     <string name="recommended_support_message">透過此連結購買，我們會獲得佣金。</string>
     <string name="recommended_about_heading">關於本遊戲</string>
     <string name="recommended_review_count">基於 %1$s 則評價</string>
+    <string name="library_store_media_page">第 %1$d 項，共 %2$d 項</string>
+    <string name="library_store_media_fullscreen">以全螢幕檢視媒體</string>
+    <string name="library_store_media_close">關閉全螢幕媒體</string>
+    <string name="library_store_media_previous">上一個媒體</string>
+    <string name="library_store_media_next">下一個媒體</string>
+    <string name="library_store_about_expand">展開「關於本遊戲」</string>
+    <string name="library_store_about_collapse">收合「關於本遊戲」</string>
     <string name="review_overwhelmingly_positive">壓倒性好評</string>
     <string name="review_very_positive">極度好評</string>
     <string name="review_mostly_positive">大多好評</string>
@@ -1666,6 +1700,7 @@
     <string name="hltb_all_styles">所有風格</string>
     <string name="hltb_hours_value">%sh</string>
     <string name="hltb_section_title">HLTB</string>
+    <string name="hltb_show_spoilers">顯示劇透</string>
 
     <!-- LSFG-VK frame generation -->
     <string name="lsfg_tab_title">LSFG-VK</string>
@@ -1747,6 +1782,7 @@
     <string name="filter_five_star_device">裝置上的五星評論</string>
     <string name="filter_five_star_gpu">GPU上的五星評論</string>
     <string name="filter_proven_gpu">已在您的GPU上驗證</string>
+    <string name="vibration_intensity">震動強度</string>
     <string name="option_import_files">匯入檔案</string>
     <string name="option_export_files">匯出檔案</string>
     <string name="container_files_up">上一層</string>
@@ -1789,6 +1825,7 @@
     <string name="export_files_cancelled">已取消匯出</string>
     <string name="export_files_no_container">請先啟動一次遊戲以建立其容器，然後再匯出檔案。</string>
     <string name="export_files_failed_header">以下檔案無法匯出：</string>
+    <string name="app_filter_vr">VR 遊戲</string>
     <string name="option_manage_mods">管理 Nexus 模組</string>
     <string name="nexus_search_clear">清除搜尋</string>
     <string name="nexus_filter_all">全部</string>
@@ -2668,4 +2705,32 @@
     <string name="nexus_apply_failure_title">上次模組安裝失敗</string>
     <string name="nexus_apply_failure_description">此模組未標記為已安裝。對於能安全確認的變更，已嘗試回復。請查看下方的檔案錯誤，然後返回放置頁面修正或重試。</string>
     <string name="nexus_apply_failure_details">檔案錯誤：%1$d</string>
+    <string name="control_profiles">控制設定檔</string>
+    <string name="more_options">更多選項</string>
+    <string name="control_profiles_empty">沒有可用的控制設定檔。</string>
+    <string name="control_profile_applied_sections">已套用 · %2$d 項設定中的 %1$d 項</string>
+    <string name="control_profile_apply">套用</string>
+    <string name="control_profile_applied">已套用控制設定檔</string>
+    <string name="control_profile_export">匯出</string>
+    <string name="control_profile_create_blank">空白設定檔</string>
+    <string name="control_profile_create_current">從目前控制設定建立</string>
+    <string name="control_profile_start_with">開始方式</string>
+    <string name="control_profile_create_current_hint">選擇要從此遊戲儲存的設定。</string>
+    <string name="control_profile_create_blank_hint">從空白的螢幕控制版面開始。</string>
+    <string name="control_profile_create_applies_hint">新設定檔將儲存到媒體庫並立即套用至此遊戲。</string>
+    <string name="control_profile_create_and_apply">建立並套用</string>
+    <string name="control_profile_created_applied">已建立並套用控制設定檔</string>
+    <string name="control_profile_save_current">儲存目前控制設定</string>
+    <string name="control_profile_update_current">從目前控制設定更新</string>
+    <string name="control_profile_sections">包含的設定</string>
+    <string name="control_profile_section_on_screen">螢幕控制</string>
+    <string name="control_profile_section_physical">實體控制器</string>
+    <string name="control_profile_controls_count">%1$d 個螢幕控制</string>
+    <string name="control_profile_bindings_count">%1$d 個實體控制器綁定</string>
+    <string name="control_profile_radial_count">%1$d 個徑向選單槽位</string>
+    <string name="control_profile_import_confirm">新增至媒體庫</string>
+    <string name="control_profile_saved">已儲存控制設定檔</string>
+    <string name="control_profile_failed">控制設定檔操作失敗：%1$s</string>
+    <string name="control_profile_delete_title">刪除控制設定檔？</string>
+    <string name="control_profile_delete_message">要從媒體庫移除「%1$s」嗎？已使用此設定檔的遊戲將保留其控制設定。</string>
 </resources>
